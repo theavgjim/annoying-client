@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "annoyingclient",
+  "version": "${version}",
+  "name": "Annoying Client",
+  "description": "ANNOYING CLIENT: a modular quality-of-life and visual client for Minecraft Java Edition with a ClickGUI, customizable HUD, themes and profiles.",
+  "authors": ["Annoying Client Team"],
+  "contact": {},
+  "license": "MIT",
+  "icon": "assets/annoyingclient/icon.png",
+  "environment": "client",
+  "entrypoints": {
+    "client": ["com.annoyingclient.AnnoyingClient"]
+  },
+  "mixins": ["annoyingclient.mixins.json"],
+  "depends": {
+    "fabricloader": ">=${loader_version}",
+    "minecraft": "~${minecraft_version}",
+    "java": ">=21",
+    "fabric-api": "*"
+  }
+}
