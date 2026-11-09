@@ -19,6 +19,18 @@ loom {
     runConfigs.matching { it.name == 'server' }.configureEach { ideConfigGenerated = false }
 }
 
+fabricApi {
+    // Automated in-game tests (src/gametest). They drive a real client: create a world, press keys,
+    // click the ClickGUI and take screenshots. Run with ./gradlew runClientGameTest. Not part of the mod JAR.
+    configureTests {
+        createSourceSet = true
+        modId = "annoyingclient-gametest"
+        enableGameTests = false
+        enableClientGameTests = true
+        eula = true
+    }
+}
+
 dependencies {
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
     // Official Mojang names: the same names Minecraft 26.x ships with, which keeps a later port small.
@@ -52,4 +64,59 @@ jar {
     from('LICENSE') {
         rename { "${it}_${inputs.properties.archivesName}" }
     }
+}
+
+// Launches a production-style client (intermediary names, real Fabric Loader, the release JAR and the
+// published Fabric API JAR) to verify the built mod outside the development environment:
+//   ./gradlew runProductionClient
+configurations {
+    productionMods {
+        transitive = false
+    }
+}
+
+dependencies {
+    productionMods "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
+}
+
+tasks.register('runProductionClient', net.fabricmc.loom.task.prod.ClientProductionRunTask) {
+    mods.from(tasks.named('remapJar'))
+    mods.from(configurations.productionMods)
+    runDir = project.layout.buildDirectory.dir('run/production')
+}
+
+// The same end-to-end client test, but against the release JAR in a production environment:
+//   ./gradlew runProductionClientGameTest
+def gametestJar = tasks.register('gametestJar', Jar) {
+    from sourceSets.gametest.output
+    archiveClassifier = 'gametest-dev'
+    destinationDirectory = project.layout.buildDirectory.dir('devlibs')
+}
+
+def remapGametestJar = tasks.register('remapGametestJar', net.fabricmc.loom.task.RemapJarTask) {
+    inputFile = gametestJar.flatMap { it.archiveFile }
+    archiveClassifier = 'gametest'
+    addNestedDependencies = false
+    classpath.from(sourceSets.gametest.compileClasspath)
+    destinationDirectory = project.layout.buildDirectory.dir('test-libs')
+}
+
+configurations {
+    productionTestMods {
+        transitive = false
+    }
+}
+
+dependencies {
+    // The client gametest module is not part of the Fabric API release JAR.
+    productionTestMods "net.fabricmc.fabric-api:fabric-client-gametest-api-v1:${project.fabric_client_gametest_version}"
+}
+
+tasks.register('runProductionClientGameTest', net.fabricmc.loom.task.prod.ClientProductionRunTask) {
+    mods.from(tasks.named('remapJar'))
+    mods.from(remapGametestJar)
+    mods.from(configurations.productionMods)
+    mods.from(configurations.productionTestMods)
+    jvmArgs.add('-Dfabric.client.gametest')
+    runDir = project.layout.buildDirectory.dir('run/productionGameTest')
 }

@@ -1,4 +1,4 @@
 /**
- * Concrete modules, grouped by category (Render, HUD, Utility, Visual, Miscellaneous).
+ * Concrete modules, grouped by category sub-package (render, utility, visual, misc). HUD elements live in {@code hud.element}.
  */
 package com.annoyingclient.module.impl;
