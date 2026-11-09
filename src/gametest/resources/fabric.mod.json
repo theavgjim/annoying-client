@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "id": "annoyingclient-gametest",
+  "version": "1.0.0",
+  "name": "Annoying Client Game Tests",
+  "environment": "client",
+  "entrypoints": {
+    "fabric-client-gametest": ["com.annoyingclient.gametest.AnnoyingClientGameTest"]
+  },
+  "depends": {
+    "annoyingclient": "*",
+    "fabric-client-gametest-api-v1": "*"
+  }
+}
