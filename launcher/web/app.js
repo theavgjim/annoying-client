@@ -148,6 +148,67 @@ $("#play-btn").addEventListener("click", async () => {
   await guarded($("#play-btn"), () => api("/api/play", { mode }));
 });
 
+// ---- profiles -----------------------------------------------------------------------------
+
+let profiles = null;
+let chosenTemplate = "optimized";
+
+async function loadProfiles() {
+  try { profiles = await api("/api/profiles"); } catch (e) { return; }
+  const sel = $("#profile-select");
+  sel.innerHTML = profiles.profiles.map((p) => '<option value="' + esc(p.id) + '"' + (p.id === profiles.active ? " selected" : "") + ">" + esc(p.name) + "</option>").join("");
+  $("#profile-delete").classList.toggle("hidden", profiles.active === "default");
+}
+$("#profile-select").onchange = (e) => guarded(null, async () => {
+  await api("/api/profiles/select", { id: e.target.value });
+  toast("success", "Profile switched", e.target.selectedOptions[0].textContent);
+  await refresh();
+}).finally(loadProfiles);
+
+$("#profile-new").onclick = () => {
+  const box = $("#templates");
+  box.innerHTML = profiles.templates.map((t) => '<div class="template' + (t.id === chosenTemplate ? " active" : "") + '" data-tpl="' + esc(t.id) + '"><b>' +
+    esc(t.name) + "</b><span>" + esc(t.description) + "</span></div>").join("");
+  $$("[data-tpl]", box).forEach((el) => (el.onclick = () => {
+    chosenTemplate = el.dataset.tpl;
+    $$("[data-tpl]", box).forEach((x) => x.classList.toggle("active", x === el));
+  }));
+  $("#profile-modal").classList.remove("hidden");
+  $("#new-profile-name").focus();
+};
+$("#profile-cancel").onclick = () => $("#profile-modal").classList.add("hidden");
+$("#profile-create").onclick = () => guarded($("#profile-create"), async () => {
+  const p = await api("/api/profiles/create", { name: $("#new-profile-name").value, template: chosenTemplate });
+  $("#profile-modal").classList.add("hidden");
+  toast("success", "Profile created", chosenTemplate === "optimized" ? p.name + ": downloading mods..." : p.name);
+  await loadProfiles();
+  await refresh();
+  show("play");
+});
+$("#profile-rename").onclick = () => {
+  $("#rename-input").value = $("#profile-select").selectedOptions[0]?.textContent || "";
+  $("#rename-modal").classList.remove("hidden");
+};
+$("#rename-cancel").onclick = () => $("#rename-modal").classList.add("hidden");
+$("#rename-save").onclick = () => guarded($("#rename-save"), async () => {
+  await api("/api/profiles/rename", { id: profiles.active, name: $("#rename-input").value });
+  $("#rename-modal").classList.add("hidden");
+  await loadProfiles();
+});
+$("#profile-delete").onclick = () => {
+  const name = $("#profile-select").selectedOptions[0]?.textContent || "";
+  $("#remove-text").textContent = '"' + name + '" and everything in its folder (mods, settings, worlds and screenshots) will be deleted.';
+  $("#remove-modal").classList.remove("hidden");
+};
+$("#remove-cancel").onclick = () => $("#remove-modal").classList.add("hidden");
+$("#remove-confirm").onclick = () => guarded($("#remove-confirm"), async () => {
+  await api("/api/profiles/delete", { id: profiles.active });
+  $("#remove-modal").classList.add("hidden");
+  toast("success", "Profile deleted", "");
+  await loadProfiles();
+  await refresh();
+});
+
 // ---- sign-in ------------------------------------------------------------------------------
 
 async function startLogin() {
@@ -405,6 +466,7 @@ function connect() {
     if (mode === "official" && !state.officialLauncher && state.settings.clientId) mode = "direct";
     render();
     logLines = (await api("/api/logs").catch(() => [])) || [];
+    await loadProfiles();
   }
   connect();
 })();

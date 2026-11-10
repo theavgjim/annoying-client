@@ -52,6 +52,12 @@ func main() {
 		return
 	}
 
+	profiles := loadProfiles(paths.Data)
+	paths = paths.withInstance(profiles.Dir(profiles.ActiveProfile().ID))
+	if err := paths.ensure(); err != nil {
+		fatal("Cannot create the profile folder %s: %v", paths.Instance, err)
+	}
+
 	tokenBytes := make([]byte, 24)
 	_, _ = rand.Read(tokenBytes)
 	events := newEventHub()
@@ -60,6 +66,7 @@ func main() {
 	app := &App{
 		paths: paths, settings: settings, auth: newAuthManager(filepath.Join(paths.Data, "account.dat")),
 		mods: mods, game: newGame(paths, settings, mods, events), events: events, token: hex.EncodeToString(tokenBytes),
+		profiles: profiles,
 	}
 
 	// Install Annoying Client and Fabric API right away, so they show up in the mod list before the first launch.

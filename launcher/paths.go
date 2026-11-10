@@ -47,6 +47,13 @@ func newPaths(data string) Paths {
 	return p
 }
 
+// withInstance returns the paths with the game folder switched to dir (one per profile).
+func (p Paths) withInstance(dir string) Paths {
+	p.Instance = dir
+	p.Mods = filepath.Join(dir, "mods")
+	return p
+}
+
 func (p Paths) ensure() error {
 	for _, d := range []string{p.Data, p.Runtime, p.Libraries, p.Assets, p.Versions, p.Instance, p.Mods, p.Logs, p.Natives} {
 		if err := os.MkdirAll(d, 0o755); err != nil {

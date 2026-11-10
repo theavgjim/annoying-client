@@ -73,6 +73,18 @@ h1 { font-size: 46px; margin: 6px 0 4px; letter-spacing: 1px; }
 .mode-hint { color: var(--muted); font-size: 12.5px; margin-top: 12px; min-height: 18px; }
 .mode-hint a { color: var(--accent); cursor: pointer; }
 
+.profile-bar { display: flex; align-items: center; gap: 10px; margin-bottom: 18px; flex-wrap: wrap; }
+.profile-label { color: var(--muted); font-size: 13px; }
+.profile-bar select { min-width: 220px; background: #0009; }
+.small-btn { padding: 8px 12px; }
+.icon-btn.plain:hover { background: #ffffff12; color: var(--text); }
+.modal-card.wide { width: 560px; max-width: calc(100vw - 32px); }
+.input.full { width: 100%; margin: 6px 0 14px; }
+.templates { display: grid; gap: 10px; margin-bottom: 18px; text-align: left; }
+.template { border: 1px solid var(--line); background: var(--bg2); border-radius: 12px; padding: 14px; cursor: pointer; transition: border-color .15s; }
+.template.active { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent) inset; }
+.template b { display: block; margin-bottom: 4px; }
+.template span { color: var(--muted); font-size: 13px; }
 .progress { margin-top: 22px; max-width: 560px; }
 .progress-top { display: flex; justify-content: space-between; font-size: 13px; color: var(--muted); margin-bottom: 7px; }
 .bar { height: 8px; background: #ffffff10; border-radius: 8px; overflow: hidden; }

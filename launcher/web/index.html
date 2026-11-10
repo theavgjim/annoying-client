@@ -36,6 +36,13 @@
           <div class="eyebrow">Minecraft <span id="mc-version"></span> &middot; Fabric <span id="loader-version"></span></div>
           <h1>ANNOYING <span class="grad">CLIENT</span></h1>
           <p class="lead">Your ClickGUI, HUD, themes and FPS boost, ready to play.</p>
+          <div class="profile-bar">
+            <label class="profile-label" for="profile-select">Profile</label>
+            <select id="profile-select"></select>
+            <button class="btn ghost small-btn" id="profile-new">+ New profile</button>
+            <button class="icon-btn plain" id="profile-rename" title="Rename profile"><svg viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16zM14 6l4 4" fill="none" stroke-width="2"/></svg></button>
+            <button class="icon-btn" id="profile-delete" title="Delete profile"><svg viewBox="0 0 24 24"><path d="M5 7h14M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3" fill="none" stroke-width="2"/></svg></button>
+          </div>
           <div class="play-row">
             <button class="play" id="play-btn"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg><span>PLAY</span></button>
             <div class="mode" id="mode-select">
@@ -187,6 +194,29 @@
     <div class="code" id="login-code">--------</div>
     <div class="inline center"><button class="btn" id="copy-code">Copy code</button><button class="btn ghost" id="login-close">Close</button></div>
     <p class="hint">This window closes automatically when you're signed in.</p>
+  </div>
+</div>
+<div class="modal hidden" id="profile-modal">
+  <div class="modal-card wide">
+    <h3>New profile</h3>
+    <p>Each profile has its own mods, settings and worlds.</p>
+    <input id="new-profile-name" class="input full" maxlength="40" placeholder="Profile name" value="1.21.11 optimized">
+    <div class="templates" id="templates"></div>
+    <div class="inline center"><button class="btn primary" id="profile-create">Create profile</button><button class="btn ghost" id="profile-cancel">Cancel</button></div>
+  </div>
+</div>
+<div class="modal hidden" id="rename-modal">
+  <div class="modal-card">
+    <h3>Rename profile</h3>
+    <input id="rename-input" class="input full" maxlength="40">
+    <div class="inline center"><button class="btn primary" id="rename-save">Save</button><button class="btn ghost" id="rename-cancel">Cancel</button></div>
+  </div>
+</div>
+<div class="modal hidden" id="remove-modal">
+  <div class="modal-card">
+    <h3>Delete profile?</h3>
+    <p id="remove-text"></p>
+    <div class="inline center"><button class="btn danger" id="remove-confirm">Delete</button><button class="btn ghost" id="remove-cancel">Cancel</button></div>
   </div>
 </div>
 <div class="toasts" id="toasts"></div>

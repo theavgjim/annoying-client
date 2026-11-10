@@ -24,7 +24,7 @@ const officialProfileKey = "annoying-client"
 // PlayOfficial prepares the instance and hands the launch to the official Minecraft Launcher,
 // which signs in with the player's Microsoft account. The launcher profile points at this
 // launcher's game folder, so mods, settings and optimizations are shared between both modes.
-func (g *Game) PlayOfficial(fabricProfile []byte) error {
+func (g *Game) PlayOfficial(fabricProfile []byte, profileID, profileName string) error {
 	mc := minecraftDir()
 	if st, err := os.Stat(mc); err != nil || !st.IsDir() {
 		return errors.New("the official Minecraft Launcher is not installed (no .minecraft folder). Install it from minecraft.net, start it once, then try again")
@@ -42,7 +42,7 @@ func (g *Game) PlayOfficial(fabricProfile []byte) error {
 	}
 	s := g.settings.Get()
 	profile := map[string]any{
-		"name":          "Annoying Client",
+		"name":          officialName(profileID, profileName),
 		"type":          "custom",
 		"lastUsed":      time.Now().UTC().Format("2006-01-02T15:04:05.000Z"),
 		"lastVersionId": fabricVersionID,
@@ -58,14 +58,28 @@ func (g *Game) PlayOfficial(fabricProfile []byte) error {
 		files = append(files, filepath.Join(mc, "launcher_profiles_microsoft_store.json"))
 	}
 	for _, f := range files {
-		if err := upsertLauncherProfile(f, profile); err != nil {
+		if err := upsertLauncherProfile(f, officialKey(profileID), profile); err != nil {
 			return fmt.Errorf("cannot update %s: %w", filepath.Base(f), err)
 		}
 	}
 	return startOfficialLauncher()
 }
 
-func upsertLauncherProfile(path string, profile map[string]any) error {
+func officialKey(profileID string) string {
+	if profileID == "default" {
+		return officialProfileKey
+	}
+	return officialProfileKey + "-" + profileID
+}
+
+func officialName(profileID, profileName string) string {
+	if profileID == "default" {
+		return "Annoying Client"
+	}
+	return "Annoying Client - " + profileName
+}
+
+func upsertLauncherProfile(path, key string, profile map[string]any) error {
 	root := map[string]any{}
 	data, err := os.ReadFile(path)
 	switch {
@@ -89,12 +103,12 @@ func upsertLauncherProfile(path string, profile map[string]any) error {
 		profiles = map[string]any{}
 		root["profiles"] = profiles
 	}
-	if old, ok := profiles[officialProfileKey].(map[string]any); ok && old["created"] != nil {
+	if old, ok := profiles[key].(map[string]any); ok && old["created"] != nil {
 		profile["created"] = old["created"]
 	} else {
 		profile["created"] = profile["lastUsed"]
 	}
-	profiles[officialProfileKey] = profile
+	profiles[key] = profile
 	out, err := json.MarshalIndent(root, "", "  ")
 	if err != nil {
 		return err

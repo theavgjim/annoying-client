@@ -1,0 +1,903 @@
+{
+ "name": "1.21.11 optimized",
+ "minecraft": "1.21.11",
+ "loader": "0.20.1",
+ "mods": [
+  {
+   "projectId": "zvNzKfGF",
+   "versionId": "P5wu4rZ2",
+   "title": "Async Logger",
+   "iconUrl": "https://cdn.modrinth.com/data/zvNzKfGF/b3cd32f8aa093ca73b960e384bf4ac46ac68aaec_96.webp",
+   "versionNumber": "2.2.3+1.21.11-fabric",
+   "filename": "asynclogger-2.2.3+1.21.11-fabric.jar",
+   "url": "https://cdn.modrinth.com/data/zvNzKfGF/versions/P5wu4rZ2/asynclogger-2.2.3%2B1.21.11-fabric.jar",
+   "sha1": "1514721244703f0c0b8710a999e79b5599596bee",
+   "sha512": "c85dca36e9f58981bac003f33e20c5d7dae425cbcb0a3f8af691cfd32f94e11905d50bae631a3d04c77a473dc22f489c6b4920394eb7c556e28996685a28cbf7",
+   "size": 596178,
+   "gameVersions": [
+    "1.21.11",
+    "1.21.8",
+    "1.21.9"
+   ],
+   "requires": []
+  },
+  {
+   "projectId": "OpQzuo63",
+   "versionId": "beD4SpM1",
+   "title": "Black Bar Concealer",
+   "iconUrl": "https://cdn.modrinth.com/data/OpQzuo63/085eb70927fd63f1c2aa589c88bf2f5c6923da32_96.webp",
+   "versionNumber": "1.0.7",
+   "filename": "blackbarconcealer-1.0.7.jar",
+   "url": "https://cdn.modrinth.com/data/OpQzuo63/versions/beD4SpM1/blackbarconcealer-1.0.7.jar",
+   "sha1": "043863174cf39abf484c7db1ba4eff21b13d9268",
+   "sha512": "8b98aafbb5e943d670bd27e8bf40554a4b517ec2cee05baeadd056f8556750f0f8e1b05060230d0cc12be5c09446690bfc30cf864c7ff4b996aa7ffcbaf90bf1",
+   "size": 79010,
+   "gameVersions": [
+    "1.21.11"
+   ],
+   "requires": [
+    "mOgUt4GM",
+    "P7dR8mSH",
+    "9s6osm5g"
+   ]
+  },
+  {
+   "projectId": "89Wsn8GD",
+   "versionId": "GAQAG80Q",
+   "title": "Capes",
+   "iconUrl": "https://cdn.modrinth.com/data/89Wsn8GD/icon.png",
+   "versionNumber": "1.5.10+1.21.11",
+   "filename": "capes-1.5.10+1.21.11-fabric.jar",
+   "url": "https://cdn.modrinth.com/data/89Wsn8GD/versions/GAQAG80Q/capes-1.5.10%2B1.21.11-fabric.jar",
+   "sha1": "8fcdc9940621070ebfb2cb387beae142fa8b42d4",
+   "sha512": "54a91977bed9eef58fedb25bc3d845e1bbac5a0c056c9e5f2672d40f54b8193f813eaf89bb243b1c88e8f37728e2d9d6682b578b036f816c7567d64d6d5436bc",
+   "size": 80534,
+   "gameVersions": [
+    "1.21.11"
+   ],
+   "requires": [
+    "Ha28R6CL",
+    "P7dR8mSH"
+   ]
+  },
+  {
+   "projectId": "9s6osm5g",
+   "versionId": "xuX40TN5",
+   "title": "Cloth Config API",
+   "iconUrl": "https://cdn.modrinth.com/data/9s6osm5g/ed8a2316cbb6f4fc5f510e8e13a59a85cbbbff4d_96.webp",
+   "versionNumber": "21.11.153+fabric",
+   "filename": "cloth-config-21.11.153-fabric.jar",
+   "url": "https://cdn.modrinth.com/data/9s6osm5g/versions/xuX40TN5/cloth-config-21.11.153-fabric.jar",
+   "sha1": "4c224606a963bce223db5b27edb4959ecf40d4ee",
+   "sha512": "8f455489d4b71069e998568cf4e1450116f4360a4eb481cd89117f629c6883164886cf63ca08ac4fc929dd13d1112152755a6216d4a1498ee6406ef102093e51",
+   "size": 1148427,
+   "gameVersions": [
+    "1.21.11"
+   ],
+   "requires": []
+  },
+  {
+   "projectId": "eHe8QhtD",
+   "versionId": "bMhjbdhu",
+   "title": "Compose Multiplatform",
+   "iconUrl": "",
+   "versionNumber": "v2.1.0+compose.1.13.0-alpha02",
+   "filename": "compose-bundle-2.1.0+compose.1.13.0-alpha02.jar",
+   "url": "https://cdn.modrinth.com/data/eHe8QhtD/versions/bMhjbdhu/compose-bundle-2.1.0%2Bcompose.1.13.0-alpha02.jar",
+   "sha1": "fb1e085a6227995961a604605eaa8ed352fe4d01",
+   "sha512": "6367dcf17f93cd664c95a7d1e9b16e4461726e342a6af8be207aa82ecbacfb213738efb856668d26f8332bcca0367fe08e57a575fc237340469ead9e9d4fc9dd",
+   "size": 12066946,
+   "gameVersions": [
+    "26.1.2",
+    "26.2",
+    "26.3"
+   ],
+   "requires": [
+    "Ha28R6CL"
+   ]
+  },
+  {
+   "projectId": "1IjD5062",
+   "versionId": "mX1iknM1",
+   "title": "Continuity",
+   "iconUrl": "https://cdn.modrinth.com/data/1IjD5062/icon.png",
+   "versionNumber": "3.0.1-beta.1+1.21.11",
+   "filename": "continuity-3.0.1-beta.1+1.21.11.jar",
+   "url": "https://cdn.modrinth.com/data/1IjD5062/versions/mX1iknM1/continuity-3.0.1-beta.1%2B1.21.11.jar",
+   "sha1": "51d34c3f2035db0c7fca321b2d94f01b5167707c",
+   "sha512": "b092e95668bf5e32d531842d920e99f865213eaf3e7c26759b51e5a95ef2702c2c0485bba6d8adf4543e8d71680d5a05fad68e94159e8e507033b516b736eb60",
+   "size": 997125,
+   "gameVersions": [
+    "1.21.11"
+   ],
+   "requires": [
+    "P7dR8mSH"
+   ]
+  },
+  {
+   "projectId": "ETlrkaYF",
+   "versionId": "AUqG5Vea",
+   "title": "Cubes Without Borders",
+   "iconUrl": "https://cdn.modrinth.com/data/ETlrkaYF/6c1711b4b788b5f25cc1e99ed8805aea94d9e167_96.webp",
+   "versionNumber": "5.0.0+1.21.11.fabric",
+   "filename": "cwb-5.0.0+1.21.11.fabric.jar",
+   "url": "https://cdn.modrinth.com/data/ETlrkaYF/versions/AUqG5Vea/cwb-5.0.0%2B1.21.11.fabric.jar",
+   "sha1": "3097e866abb675d73d9ec3b00f43078d6e8ae831",
+   "sha512": "c01ee1b7682862968a6e075e6858828876ffa1566243cfbf1838bf0d7d2b5b9468f93a26f1d4fb1335b9cac7ddece50257f823764cb1e13461f33790e9c424f8",
+   "size": 88896,
+   "gameVersions": [
+    "1.21.11"
+   ],
+   "requires": []
+  },
+  {
+   "projectId": "QwxR6Gcd",
+   "versionId": "eY6cliLn",
+   "title": "Debugify",
+   "iconUrl": "https://cdn.modrinth.com/data/QwxR6Gcd/d16ec025a7f2d9908248bb4d1477e3e624a2f17f_96.webp",
+   "versionNumber": "1.21.11+1.2",
+   "filename": "debugify-1.21.11+1.2.jar",
+   "url": "https://cdn.modrinth.com/data/QwxR6Gcd/versions/eY6cliLn/debugify-1.21.11%2B1.2.jar",
+   "sha1": "996ddc157481f3350310fde42da3fb89bab067bc",
+   "sha512": "763d64b7ae392e19384fbc5d70cfd48f6444d49ef38a43174c98406e741b305eff0bbe35652364b68a4ae489dfb376f919e9c963117633261bcd18a7f214ff74",
+   "size": 379984,
+   "gameVersions": [
+    "1.21.11"
+   ],
+   "requires": [
+    "1eAoo2KR",
+    "P7dR8mSH"
+   ]
+  },
+  {
+   "projectId": "Si9Uim4y",
+   "versionId": "yn6fzG3B",
+   "title": "Detail Armor Bar Reconstructed",
+   "iconUrl": "https://cdn.modrinth.com/data/Si9Uim4y/01f8bfb3455a5c13bdd8bc3402e4779ecf3b7bbe_96.webp",
+   "versionNumber": "5.2.1+1.21.9_11-fabric",
+   "filename": "DetailArmorBarReconstructed-5.2.1+1.21.9_11-fabric.jar",
+   "url": "https://cdn.modrinth.com/data/Si9Uim4y/versions/yn6fzG3B/DetailArmorBarReconstructed-5.2.1%2B1.21.9_11-fabric.jar",
+   "sha1": "05649c01702cece55c4583c667e0752c32a88c16",
+   "sha512": "6784d2f5544bff17aa7db4fa9bfd60a3b7949c4e0215b85b2bf32c3776941e161db8e798e9dde11afe9db67bfd057e606294e1c44f695da67d4c0ff39331ddc0",
+   "size": 115601,
+   "gameVersions": [
+    "1.21.10",
+    "1.21.11",
+    "1.21.9"
+   ],
+   "requires": [
+    "P7dR8mSH"
+   ]
+  },
+  {
+   "projectId": "JIUF2Wb5",
+   "versionId": "5mBLMYSY",
+   "title": "Effect Timer Plus",
+   "iconUrl": "https://cdn.modrinth.com/data/JIUF2Wb5/74cccf769bd5dc23e4f7fba54823e941f2afb9f7.png",
+   "versionNumber": "2.2.7+1.21.11",
+   "filename": "effecttimerplus-fabric-2.2.7+1.21.11.jar",
+   "url": "https://cdn.modrinth.com/data/JIUF2Wb5/versions/5mBLMYSY/effecttimerplus-fabric-2.2.7%2B1.21.11.jar",
+   "sha1": "7a852400f93df5fc47637baf7000b68d2df9a630",
+   "sha512": "f06c5b091627398294cdc2aa54e1c2d78fd29b289fd1718a1a4313ccba381f17532b0e9cb5c1bde9c5f0657b9e083774ca8b3decb27be50744502ff898551dc2",
+   "size": 47633,
+   "gameVersions": [
+    "1.21.11"
+   ],
+   "requires": [
+    "1eAoo2KR",
+    "mOgUt4GM"
+   ]
+  },
+  {
+   "projectId": "4I1XuqiY",
+   "versionId": "x4GbWVyx",
+   "title": "[EMF] Entity Model Features",
+   "iconUrl": "https://cdn.modrinth.com/data/4I1XuqiY/6e5bbd0d06b1741bfdab6c0cfab6de8fdaf0064c_96.webp",
+   "versionNumber": "3.3.12-fabric-1.21.11",
+   "filename": "entity_model_features-3.3.12-1.21.11-fabric.jar",
+   "url": "https://cdn.modrinth.com/data/4I1XuqiY/versions/x4GbWVyx/entity_model_features-3.3.12-1.21.11-fabric.jar",
+   "sha1": "38770851102cbb23e2de7b55baa7530422d09349",
+   "sha512": "94832c77539e0ffa0c1a85fe99dd6e31506e2f1155601d0eb96f67796b856e84e1fed3aa0b68fd2f9ea1eb70b03668124ae77e4a754cab73d02c993f3e6c1504",
+   "size": 669397,
+   "gameVersions": [
+    "1.21.11"
+   ],
+   "requires": [
+    "BVzZfTc1"
+   ]
+  },
+  {
+   "projectId": "IMuO8COj",
+   "versionId": "45t5lBX0",
+   "title": "[ESF] Entity Sound Features",
+   "iconUrl": "https://cdn.modrinth.com/data/IMuO8COj/a46f4aa1a729bd9114ce610df40b543c144a95d5_96.webp",
+   "versionNumber": "0.8.2-fabric-1.21.9",
+   "filename": "entity_sound_features-0.8.2-1.21.9-fabric.jar",
+   "url": "https://cdn.modrinth.com/data/IMuO8COj/versions/45t5lBX0/entity_sound_features-0.8.2-1.21.9-fabric.jar",
+   "sha1": "1fb9654460d5d88fa3e8bb796065e58e1033a9f5",
+   "sha512": "4134cd002233ffda3dd88bc808acb91bd57dac4e85097ebe151684ec477b160e99d20ab0379a9de054b9249d284087af85380af2875a5ce13b13f4cdbf37f565",
+   "size": 96717,
+   "gameVersions": [
+    "1.21.10",
+    "1.21.11",
+    "1.21.9"
+   ],
+   "requires": [
+    "BVzZfTc1",
+    "4I1XuqiY"
+   ]
+  },
+  {
+   "projectId": "BVzZfTc1",
+   "versionId": "itjOkghQ",
+   "title": "[ETF] Entity Texture Features",
+   "iconUrl": "https://cdn.modrinth.com/data/BVzZfTc1/af683d206d50b05258d865b0d6e4aa2f2cee12f2_96.webp",
+   "versionNumber": "7.2.7-fabric-1.21.11",
+   "filename": "entity_texture_features-7.2.7-1.21.11-fabric.jar",
+   "url": "https://cdn.modrinth.com/data/BVzZfTc1/versions/itjOkghQ/entity_texture_features-7.2.7-1.21.11-fabric.jar",
+   "sha1": "88cc388617f63c15a8a2771288cd62aa05878a35",
+   "sha512": "2239aa6941bb6eac9f89aa601210243bc72c260ea8517a5e5b39ac65a49f827bfa83f9a90838b5c8c04b833a239c9ed7a228ca32b632529aa398aa607aea63c8",
+   "size": 808818,
+   "gameVersions": [
+    "1.21.11"
+   ],
+   "requires": []
+  },
+  {
+   "projectId": "NNAgCjsB",
+   "versionId": "CTabrwB1",
+   "title": "Entity Culling",
+   "iconUrl": "https://cdn.modrinth.com/data/NNAgCjsB/7873452d6cede4daed12da3d7d8c193ab88b4fd6_96.webp",
+   "versionNumber": "1.11.3",
+   "filename": "entityculling-fabric-1.11.3-mc1.21.11.jar",
+   "url": "https://cdn.modrinth.com/data/NNAgCjsB/versions/CTabrwB1/entityculling-fabric-1.11.3-mc1.21.11.jar",
+   "sha1": "ce2e1cf7e343a625d184c80ccea582d468686a2e",
+   "sha512": "4b5516bf8718d74db0e0368ad2fd2f5ce3e986c3abbf65426418ce3ec162651d29579b9be8aa0d34b88f47e310f6b7bab56bde7ff1223c35998bff0bcbed58c5",
+   "size": 1529094,
+   "gameVersions": [
+    "1.21.11"
+   ],
+   "requires": [
+    "P7dR8mSH"
+   ]
+  },
+  {
+   "projectId": "P7dR8mSH",
+   "versionId": "6qAuTtLR",
+   "title": "Fabric API",
+   "iconUrl": "https://cdn.modrinth.com/data/P7dR8mSH/icon.png",
+   "versionNumber": "0.141.6+1.21.11",
+   "filename": "fabric-api-0.141.6+1.21.11.jar",
+   "url": "https://cdn.modrinth.com/data/P7dR8mSH/versions/6qAuTtLR/fabric-api-0.141.6%2B1.21.11.jar",
+   "sha1": "c98467cbbaf4d197377266795ae015f4130d65b6",
+   "sha512": "852d3682c4f353fd0ca86546af8578513e8bcf628377fa9d49c556bc59c5024c69ab56c92fc6dfba11fed19e4316a3f5636e7e07fd3d96f7043b531aef59b637",
+   "size": 2426039,
+   "gameVersions": [
+    "1.21.11"
+   ],
+   "requires": []
+  },
+  {
+   "projectId": "Ha28R6CL",
+   "versionId": "SKW1BTL3",
+   "title": "Fabric Language Kotlin",
+   "iconUrl": "https://cdn.modrinth.com/data/Ha28R6CL/72c3d74aeb665e45aea93a945a01474cbce3b7da_96.webp",
+   "versionNumber": "1.14.2+kotlin.2.4.21",
+   "filename": "fabric-language-kotlin-1.14.2+kotlin.2.4.21.jar",
+   "url": "https://cdn.modrinth.com/data/Ha28R6CL/versions/SKW1BTL3/fabric-language-kotlin-1.14.2%2Bkotlin.2.4.21.jar",
+   "sha1": "f1d4ab6ecd54d9782521333a87eb50724ecb03e0",
+   "sha512": "7fb475c4a7e7bdf8d0aca4b5798a58a354c51443d5b1fbde3e8cf34dfbf7191ef4238b5f07d08ec9490ec180b371624523326c3ad45d4ed2b2be541de9407e5d",
+   "size": 8142878,
+   "gameVersions": [
+    "26.1.2",
+    "26.2",
+    "26.3"
+   ],
+   "requires": []
+  },
+  {
+   "projectId": "x1hIzbuY",
+   "versionId": "ip2tVKLp",
+   "title": "FastQuit",
+   "iconUrl": "https://cdn.modrinth.com/data/x1hIzbuY/930154d1ed3e855079c5f6ee63faeb9bcbe87cfd_96.webp",
+   "versionNumber": "3.1.3+mc1.21.11",
+   "filename": "fastquit-3.1.3+mc1.21.11.jar",
+   "url": "https://cdn.modrinth.com/data/x1hIzbuY/versions/ip2tVKLp/fastquit-3.1.3%2Bmc1.21.11.jar",
+   "sha1": "9ba127357e1fc9ff800496250fb510f70f394714",
+   "sha512": "29f080e82b58833cc2bb6af677c7b49825dbfeee8340d6952aadacbf83a3f5cdb71e2d1145b0e60f7454274577930c3600f3fe8a6f95cb5a423fa6f80d409a01",
+   "size": 61123,
+   "gameVersions": [
+    "1.21.11"
+   ],
+   "requires": [
+    "9s6osm5g",
+    "P7dR8mSH"
+   ]
+  },
+  {
+   "projectId": "uXXizFIs",
+   "versionId": "Ii0gP3D8",
+   "title": "FerriteCore",
+   "iconUrl": "https://cdn.modrinth.com/data/uXXizFIs/222a126f26f8f9ae1eb339f3b767677f18bff31f_96.webp",
+   "versionNumber": "8.2.0-fabric",
+   "filename": "ferritecore-8.2.0-fabric.jar",
+   "url": "https://cdn.modrinth.com/data/uXXizFIs/versions/Ii0gP3D8/ferritecore-8.2.0-fabric.jar",
+   "sha1": "c2e2f5e008f5bc9f401dfad8ca94909917006b65",
+   "sha512": "3210926a82eb32efd9bcebabe2f6c053daf5c4337eebc6d5bacba96d283510afbde646e7e195751de795ec70a2ea44fef77cb54bf22c8e57bb832d6217418869",
+   "size": 80138,
+   "gameVersions": [
+    "1.21.11"
+   ],
+   "requires": []
+  },
+  {
+   "projectId": "7MoE34WK",
+   "versionId": "xZtmUCcz",
+   "title": "Gnetum",
+   "iconUrl": "https://cdn.modrinth.com/data/7MoE34WK/859d00e4c659579b988c3a10ecec1c30fb572158.png",
+   "versionNumber": "4.6.4+1.21.11-fabric",
+   "filename": "Gnetum-4.6.4+1.21.11-fabric.jar",
+   "url": "https://cdn.modrinth.com/data/7MoE34WK/versions/xZtmUCcz/Gnetum-4.6.4%2B1.21.11-fabric.jar",
+   "sha1": "62278e997cfb9e01974c65b44adbbdf5ac2cb434",
+   "sha512": "23760debb62ab7863782cc33a8f540b5127d65373e7ebb2e5b3996b8a2124345e8277d23349c14079dd5ca5ec08d355434d96b21d3b0408f38d2906e1aa0bbb5",
+   "size": 97456,
+   "gameVersions": [
+    "1.21.11"
+   ],
+   "requires": [
+    "P7dR8mSH"
+   ]
+  },
+  {
+   "projectId": "5ZwdcRci",
+   "versionId": "4EwhsTu7",
+   "title": "ImmediatelyFast",
+   "iconUrl": "https://cdn.modrinth.com/data/5ZwdcRci/e57b6b451425692ac17ad322d5e14bea686a383a_96.webp",
+   "versionNumber": "1.14.3+1.21.11-fabric",
+   "filename": "ImmediatelyFast-Fabric-1.14.3+1.21.11.jar",
+   "url": "https://cdn.modrinth.com/data/5ZwdcRci/versions/4EwhsTu7/ImmediatelyFast-Fabric-1.14.3%2B1.21.11.jar",
+   "sha1": "43e451464f979bdf9ff4ac288b358a2f91b79ed8",
+   "sha512": "2564cb28259352c3aa5759aceca62667de08a7860a40910dad40a043af851a074b2d75cef50b9fa6f1971febb3a5ecebe4067cbd4b60e63ef711b85f4bc21407",
+   "size": 302709,
+   "gameVersions": [
+    "1.21.11"
+   ],
+   "requires": []
+  },
+  {
+   "projectId": "YL57xq9U",
+   "versionId": "ka9PDlsN",
+   "title": "Iris Shaders",
+   "iconUrl": "https://cdn.modrinth.com/data/YL57xq9U/18d0e7f076d3d6ed5bedd472b853909aac5da202_96.webp",
+   "versionNumber": "1.10.8+1.21.11-fabric",
+   "filename": "iris-fabric-1.10.8+mc1.21.11.jar",
+   "url": "https://cdn.modrinth.com/data/YL57xq9U/versions/ka9PDlsN/iris-fabric-1.10.8%2Bmc1.21.11.jar",
+   "sha1": "acfbe6d065b6c35d85c14da04d35e073363f3acf",
+   "sha512": "f0cad4b6af593b6fc25738c4ef5a2b346125f9693d25a0d486858e54798d2ea87b24d1497e1bb4391729d7d9e490f42771f7fb468d4e1420e372d8643f9e2055",
+   "size": 2807718,
+   "gameVersions": [
+    "1.21.11"
+   ],
+   "requires": [
+    "AANobbMI"
+   ]
+  },
+  {
+   "projectId": "gvQqBUqZ",
+   "versionId": "Ow7wA0kG",
+   "title": "Lithium",
+   "iconUrl": "https://cdn.modrinth.com/data/gvQqBUqZ/bcc8686c13af0143adf4285d741256af824f70b7_96.webp",
+   "versionNumber": "mc1.21.11-0.21.4-fabric",
+   "filename": "lithium-fabric-0.21.4+mc1.21.11.jar",
+   "url": "https://cdn.modrinth.com/data/gvQqBUqZ/versions/Ow7wA0kG/lithium-fabric-0.21.4%2Bmc1.21.11.jar",
+   "sha1": "203bdcb26e97b3217b045e1182651a7d7b6462ec",
+   "sha512": "f14a5c3d2fad786347ca25083f902139694f618b7c103947f2fd067a7c5ee88a63e1ef8926f7d693ea79ed7d00f57317bae77ef9c2d630bf5ed01ac97a752b94",
+   "size": 900462,
+   "gameVersions": [
+    "1.21.11"
+   ],
+   "requires": []
+  },
+  {
+   "projectId": "hwRo6mwQ",
+   "versionId": "wrFyE1h4",
+   "title": "Log Cleaner",
+   "iconUrl": "https://cdn.modrinth.com/data/hwRo6mwQ/797f2ec51b4007295b0ddc47f0b6d464301e996e.png",
+   "versionNumber": "1.0.0",
+   "filename": "logcleaner-1.0.0.jar",
+   "url": "https://cdn.modrinth.com/data/hwRo6mwQ/versions/wrFyE1h4/logcleaner-1.0.0.jar",
+   "sha1": "d5ad1da47cd99118a768f60a7d00481ab10bc4f5",
+   "sha512": "15fb0be504ba6ff727688fec8e4b654b23d69d515a600512b4549f604bb3ec4550fa17e9bf14a98f9d39de57f3441313e774027e892def2e87287601f16ab1fb",
+   "size": 5008,
+   "gameVersions": [
+    "26.3-snapshot-8",
+    "26.3-snapshot-9",
+    "26w14a"
+   ],
+   "requires": []
+  },
+  {
+   "projectId": "TjSm1wrD",
+   "versionId": "QrRIY2rV",
+   "title": "ModernFix-mVUS",
+   "iconUrl": "https://cdn.modrinth.com/data/TjSm1wrD/e1d2433476995be1b1a94ff1afaf6167752274ae_96.webp",
+   "versionNumber": "5.26.3-build.2",
+   "filename": "modernfix-5.26.3-build.2.jar",
+   "url": "https://cdn.modrinth.com/data/TjSm1wrD/versions/QrRIY2rV/modernfix-5.26.3-build.2.jar",
+   "sha1": "5a51d1a9768bbf9943e6eef83abf43d2b82baa30",
+   "sha512": "81c991b1ab4e13a68cf79c25cd39cd3073348907ec002745c030d6a5d26fe5abd6eab1d35325e66acccdada2b78786c742581bd92e4e8ad9f3a424a0e98fe006",
+   "size": 630900,
+   "gameVersions": [
+    "1.21.11"
+   ],
+   "requires": []
+  },
+  {
+   "projectId": "mOgUt4GM",
+   "versionId": "cLkYaVuL",
+   "title": "Mod Menu",
+   "iconUrl": "https://cdn.modrinth.com/data/mOgUt4GM/5a20ed1450a0e1e79a1fe04e61bb4e5878bf1d20.png",
+   "versionNumber": "17.0.1",
+   "filename": "modmenu-17.0.1.jar",
+   "url": "https://cdn.modrinth.com/data/mOgUt4GM/versions/cLkYaVuL/modmenu-17.0.1.jar",
+   "sha1": "d5612d70bda58e0179b177ca9990e57471e67d19",
+   "sha512": "cb68cc39c8da66d05a1d2054a0e7b62144881e0cdb5fd681bc4f337b1313fafac394246f4e0aa0c4b6343db9e9750250a00c1bb72689b762da685ce1ccfee51f",
+   "size": 960882,
+   "gameVersions": [
+    "1.21.11"
+   ],
+   "requires": [
+    "P7dR8mSH",
+    "eXts2L7r"
+   ]
+  },
+  {
+   "projectId": "8qkXwOnk",
+   "versionId": "3siYJiWG",
+   "title": "More Chat History",
+   "iconUrl": "https://cdn.modrinth.com/data/8qkXwOnk/icon.png",
+   "versionNumber": "1.3.1",
+   "filename": "morechathistory-1.3.1.jar",
+   "url": "https://cdn.modrinth.com/data/8qkXwOnk/versions/3siYJiWG/morechathistory-1.3.1.jar",
+   "sha1": "b4337ef9dc0a6cdf31d8f3df68a6542f64f3625e",
+   "sha512": "31831973dafb0cd4e1ead267b0143aa9ce803d8ebf8fec1dfad884c62ad52cf94da0349b2b0b72d9c0c9a7fb83af75180d85e7ea8a44c459d4d5e960b4e3ea06",
+   "size": 3573,
+   "gameVersions": [
+    "1.21.7",
+    "1.21.8",
+    "1.21.9"
+   ],
+   "requires": []
+  },
+  {
+   "projectId": "UR0ocuEt",
+   "versionId": "QCCwjcnx",
+   "title": "NBT Autocomplete",
+   "iconUrl": "https://cdn.modrinth.com/data/UR0ocuEt/3114a4cea537fed3e2d86156b555a5b3d7bdd5ca.png",
+   "versionNumber": "2.1-fabric-1.21.11",
+   "filename": "NBTac-FABRIC-1.21.11-2.1.jar",
+   "url": "https://cdn.modrinth.com/data/UR0ocuEt/versions/QCCwjcnx/NBTac-FABRIC-1.21.11-2.1.jar",
+   "sha1": "c57202eefe67f2f2362086670cb22fad5a47c22d",
+   "sha512": "6b161cc59792a27ea69f90400503b588e67595b58407be0030f5da48be5ef03775cc59791931387244799b754da5f27bb77b8780f4f68ad255326efe6f22d577",
+   "size": 282057,
+   "gameVersions": [
+    "1.21.11"
+   ],
+   "requires": [
+    "P7dR8mSH"
+   ]
+  },
+  {
+   "projectId": "yM94ont6",
+   "versionId": "C1S3kMbN",
+   "title": "Not Enough Crashes",
+   "iconUrl": "https://cdn.modrinth.com/data/yM94ont6/0bd6cd7608cde62529c05ed19626029c062107ed_96.webp",
+   "versionNumber": "4.4.9+1.21.11-fabric",
+   "filename": "notenoughcrashes-fabric-4.4.9+1.21.11.jar",
+   "url": "https://cdn.modrinth.com/data/yM94ont6/versions/C1S3kMbN/notenoughcrashes-fabric-4.4.9%2B1.21.11.jar",
+   "sha1": "bd074fca3afb865fd21fccfc491056d1fe2c2e82",
+   "sha512": "139a52aa93382ea127ff8cb1caf93274fb7336d2ddc2ee11140297bee0547eff8474064ccb819cc8ed5498b6f658e31c64da69b885fd796ad7af76bb8361db59",
+   "size": 604756,
+   "gameVersions": [
+    "1.21.11"
+   ],
+   "requires": []
+  },
+  {
+   "projectId": "AtOSAunf",
+   "versionId": "K0N0A6aD",
+   "title": "Optimized Block Entities [OBE]",
+   "iconUrl": "https://cdn.modrinth.com/data/AtOSAunf/69b47bd32742ce09ef7a03ccc2fc5876aff60413_96.webp",
+   "versionNumber": "1.2.0",
+   "filename": "obe+1.21.11-1.2.0.jar",
+   "url": "https://cdn.modrinth.com/data/AtOSAunf/versions/K0N0A6aD/obe%2B1.21.11-1.2.0.jar",
+   "sha1": "7ffcb9636a391b264d0490a43c2249e0a4eb22e7",
+   "sha512": "776a5089f6b03242eb712dd7a5df53095d1c088886d6bde013239e0c5d617258090f88c2b9ba9068418a1d7cf2b547f69e255a23fbaa9d6287842675b24ce36c",
+   "size": 252192,
+   "gameVersions": [
+    "1.21.11"
+   ],
+   "requires": [
+    "P7dR8mSH"
+   ]
+  },
+  {
+   "projectId": "AibBIVmj",
+   "versionId": "6AuGXqDS",
+   "title": "OneConfig",
+   "iconUrl": "https://cdn.modrinth.com/data/AibBIVmj/073a92ecc8bb5650456758f1a58990801de64db5_96.webp",
+   "versionNumber": "v1.6.2",
+   "filename": "OneConfig-1.21.11-fabric-1.6.2.jar",
+   "url": "https://cdn.modrinth.com/data/AibBIVmj/versions/6AuGXqDS/OneConfig-1.21.11-fabric-1.6.2.jar",
+   "sha1": "283269d20850f122fcf6d0c796f5238085d85552",
+   "sha512": "f8ebe7f5a3e0c5eb3931d8b397742b204450d5aa18f9c98d1afd4a17f1669f898f3ca75764eb9d7ceb3bc86bf3864240709d51384e006392f3a39c41fda52e8d",
+   "size": 13705462,
+   "gameVersions": [
+    "1.21.11"
+   ],
+   "requires": [
+    "eHe8QhtD",
+    "Ha28R6CL",
+    "P7dR8mSH"
+   ]
+  },
+  {
+   "projectId": "eXts2L7r",
+   "versionId": "qxjzQ9xY",
+   "title": "Text Placeholder API",
+   "iconUrl": "https://cdn.modrinth.com/data/eXts2L7r/e9c9990896e6422bffc5f73d2c41b8f077348f83.png",
+   "versionNumber": "2.8.2+1.21.10",
+   "filename": "placeholder-api-2.8.2+1.21.10.jar",
+   "url": "https://cdn.modrinth.com/data/eXts2L7r/versions/qxjzQ9xY/placeholder-api-2.8.2%2B1.21.10.jar",
+   "sha1": "bbdc920ecff993148cd6e81a208536132245ce40",
+   "sha512": "507ab10b7938dcd14d33121b8462649bdbe575cef248e917dfdf7566078ab5d0195ca1add95eae4863de3f652eb56db0a8669a67d5b5344e094d086f9dab5a08",
+   "size": 268662,
+   "gameVersions": [
+    "1.21.10",
+    "1.21.11"
+   ],
+   "requires": []
+  },
+  {
+   "projectId": "hbSfT032",
+   "versionId": "k469l3Gv",
+   "title": "Polydium",
+   "iconUrl": "",
+   "versionNumber": "v1.4.1",
+   "filename": "polydium-1.4.1+1.21.11.jar",
+   "url": "https://cdn.modrinth.com/data/hbSfT032/versions/k469l3Gv/polydium-1.4.1%2B1.21.11.jar",
+   "sha1": "ddce65220844709885284e0ad99a25379aecba0b",
+   "sha512": "45a78860adcdb46bc4a56545750c5024fb89f7b4a52f93c10c043e952b590427fc3ab21dc1cc20411a8f3aeb6663d9467b06e7e9f41d267c18636d00c02b40cb",
+   "size": 25328829,
+   "gameVersions": [
+    "1.21.11"
+   ],
+   "requires": [
+    "P7dR8mSH",
+    "Ha28R6CL",
+    "AibBIVmj"
+   ]
+  },
+  {
+   "projectId": "Bh37bMuy",
+   "versionId": "ffpCc8nY",
+   "title": "Reese's Sodium Options",
+   "iconUrl": "https://cdn.modrinth.com/data/Bh37bMuy/icon.png",
+   "versionNumber": "mc1.21.11-2.2.4+fabric",
+   "filename": "reeses-sodium-options-fabric-2.2.4+mc1.21.11.jar",
+   "url": "https://cdn.modrinth.com/data/Bh37bMuy/versions/ffpCc8nY/reeses-sodium-options-fabric-2.2.4%2Bmc1.21.11.jar",
+   "sha1": "295623b7f0bd9ffb365e2364d7229b6ed1e2bedc",
+   "sha512": "224e324effcaa03a38582b05c09cbd79a5922e916888b45849d966a6a7f30a7be18a8cc2ea09f44e79e6ea1a8d143a28c3cbfafdb398025b48ab1a1a7d71fd49",
+   "size": 258250,
+   "gameVersions": [
+    "1.21.11"
+   ],
+   "requires": [
+    "AANobbMI"
+   ]
+  },
+  {
+   "projectId": "RLzHAoZe",
+   "versionId": "kjLSJUxq",
+   "title": "Resourcify",
+   "iconUrl": "https://cdn.modrinth.com/data/RLzHAoZe/a353989ea9f0f124ebe7cf3e67274c2d72751431_96.webp",
+   "versionNumber": "1.8.7",
+   "filename": "Resourcify (1.21.11-fabric)-1.8.7.jar",
+   "url": "https://cdn.modrinth.com/data/RLzHAoZe/versions/kjLSJUxq/Resourcify%20%281.21.11-fabric%29-1.8.7.jar",
+   "sha1": "c703436600a52c1df4778af2f018d9f9069608a6",
+   "sha512": "d9e0e07d270a0384bfe2a252ee429e594eac89d81e521cb913a6a3f8dbec2540238885fb3628c89b7bd7540ad66dedd9e5d8e5d300d1c2e178533ddc92027bce",
+   "size": 2968366,
+   "gameVersions": [
+    "1.21.11"
+   ],
+   "requires": [
+    "Ha28R6CL",
+    "P7dR8mSH"
+   ]
+  },
+  {
+   "projectId": "Ps1zyz6x",
+   "versionId": "PV9KcrYQ",
+   "title": "ScalableLux",
+   "iconUrl": "https://cdn.modrinth.com/data/Ps1zyz6x/27133942a1a58af1bb11b087957ea4cc14414dd3_96.webp",
+   "versionNumber": "0.1.6+fabric.c25518a",
+   "filename": "ScalableLux-0.1.6+fabric.c25518a-all.jar",
+   "url": "https://cdn.modrinth.com/data/Ps1zyz6x/versions/PV9KcrYQ/ScalableLux-0.1.6%2Bfabric.c25518a-all.jar",
+   "sha1": "9df93ab6442fa374c17fab6b5181fe2c215d9d5b",
+   "sha512": "729515c1e75cf8d9cd704f12b3487ddb9664cf9928e7b85b12289c8fbbc7ed82d0211e1851375cbd5b385820b4fedbc3f617038fff5e30b302047b0937042ae7",
+   "size": 182846,
+   "gameVersions": [
+    "1.21.10",
+    "1.21.11",
+    "1.21.9"
+   ],
+   "requires": []
+  },
+  {
+   "projectId": "8MEn1Qsz",
+   "versionId": "lulLiQZV",
+   "title": "Scroll Tweaks",
+   "iconUrl": "https://cdn.modrinth.com/data/8MEn1Qsz/2f09ac8558458d122825a20edc33dcdc9d60abd0_96.webp",
+   "versionNumber": "1.0.5",
+   "filename": "scrolltweaks-1.0.5+1.21.5-fabric.jar",
+   "url": "https://cdn.modrinth.com/data/8MEn1Qsz/versions/lulLiQZV/scrolltweaks-1.0.5%2B1.21.5-fabric.jar",
+   "sha1": "2cc53863e9878b61d82e7e832b6f391ff48b37a9",
+   "sha512": "bd6059aca44f4d483e6644342d195ec196b333a744ae076e964767445cc1819dae4dc85b5d79ed8ccd20a3108145632959de22cd5214b2781f6c076357dd7201",
+   "size": 37207,
+   "gameVersions": [
+    "1.21.11",
+    "1.21.5",
+    "1.21.8"
+   ],
+   "requires": [
+    "mOgUt4GM",
+    "1eAoo2KR",
+    "P7dR8mSH"
+   ]
+  },
+  {
+   "projectId": "HfLFMeJe",
+   "versionId": "U0KdeHqo",
+   "title": "Shield Fixes",
+   "iconUrl": "https://cdn.modrinth.com/data/HfLFMeJe/4cdbe16ddfccb93066d33680d6d5ba9a220b5767.png",
+   "versionNumber": "2.1.0+1.21.11",
+   "filename": "ShieldFixes-2.1.0+1.21.11.jar",
+   "url": "https://cdn.modrinth.com/data/HfLFMeJe/versions/U0KdeHqo/ShieldFixes-2.1.0%2B1.21.11.jar",
+   "sha1": "936f01cce1b994a6b8934065f9f02238473df61d",
+   "sha512": "8480360ff8c504164df4bab02f9f16632d906f239be0b268834079f0903356bf3c71ed580af728cfa1ca2cecbfde1c0c11ccf86f9b04363458f7e08ccd4b1745",
+   "size": 19388,
+   "gameVersions": [
+    "1.21.11"
+   ],
+   "requires": [
+    "7P86n6Vg"
+   ]
+  },
+  {
+   "projectId": "2M01OLQq",
+   "versionId": "rZovgkWT",
+   "title": "Shulker Box Tooltip",
+   "iconUrl": "https://cdn.modrinth.com/data/2M01OLQq/bb490716cf2590cf84100a495931c3d4743bce43_96.webp",
+   "versionNumber": "5.2.16+1.21.11-fabric",
+   "filename": "shulkerboxtooltip-fabric-5.2.16+1.21.11.jar",
+   "url": "https://cdn.modrinth.com/data/2M01OLQq/versions/rZovgkWT/shulkerboxtooltip-fabric-5.2.16%2B1.21.11.jar",
+   "sha1": "3f889de77a0aec69ffcfd28bf6fb2c077443788a",
+   "sha512": "98cd0950adafa086201d4595e558c15697ba1c9eda1b47c30803081ae48e2594e74cae5b743b3283990fa9d0da6caab87958bf2e97125bc3cb9107f6ab6f1882",
+   "size": 389259,
+   "gameVersions": [
+    "1.21.11"
+   ],
+   "requires": [
+    "P7dR8mSH"
+   ]
+  },
+  {
+   "projectId": "XDGYMuZ6",
+   "versionId": "JWf2R01O",
+   "title": "Slipstream",
+   "iconUrl": "https://cdn.modrinth.com/data/XDGYMuZ6/5fb83edaa9ab525c84c96e5ecc4759c9bb5a4be1_96.webp",
+   "versionNumber": "0.1.0-1.21.11-fabric",
+   "filename": "slipstream-1.21.11-fabric-0.1.0.jar",
+   "url": "https://cdn.modrinth.com/data/XDGYMuZ6/versions/JWf2R01O/slipstream-1.21.11-fabric-0.1.0.jar",
+   "sha1": "34ed29bffe1f2ac5c0775c9b37f4b615f1af789e",
+   "sha512": "30762a4c320e02f65d7fe3f4a8d338299d2df7f62f42e80c5e49da6dd53c23a2e34b9c3be223c575feecf3bfde6fecc7b16a7392f0d726150d4fb2078260cd64",
+   "size": 193795,
+   "gameVersions": [
+    "1.21.7",
+    "1.21.8",
+    "1.21.9"
+   ],
+   "requires": []
+  },
+  {
+   "projectId": "PtjYWJkn",
+   "versionId": "efIKaD8Q",
+   "title": "Sodium Extra",
+   "iconUrl": "https://cdn.modrinth.com/data/PtjYWJkn/0df4fb22a11e1dcb5e83cb0aadd275b571aca7a9_96.webp",
+   "versionNumber": "mc1.21.11-0.9.5+fabric",
+   "filename": "sodium-extra-fabric-0.9.5+mc1.21.11.jar",
+   "url": "https://cdn.modrinth.com/data/PtjYWJkn/versions/efIKaD8Q/sodium-extra-fabric-0.9.5%2Bmc1.21.11.jar",
+   "sha1": "131a81641152efd5feb90bdb643d82726ec1da89",
+   "sha512": "60716a8f0780dcedc230dda3c93265d55d823313a0846d6e7da482ed0c38506e04079ab72629c8c2201f1b248431d0037fc44e9be89e664b507be53a9a1668f4",
+   "size": 487570,
+   "gameVersions": [
+    "1.21.11"
+   ],
+   "requires": [
+    "AANobbMI"
+   ]
+  },
+  {
+   "projectId": "AANobbMI",
+   "versionId": "rkdTcxoT",
+   "title": "Sodium",
+   "iconUrl": "https://cdn.modrinth.com/data/AANobbMI/295862f4724dc3f78df3447ad6072b2dcd3ef0c9_96.webp",
+   "versionNumber": "mc1.21.11-0.8.14-fabric",
+   "filename": "sodium-fabric-0.8.14+mc1.21.11.jar",
+   "url": "https://cdn.modrinth.com/data/AANobbMI/versions/rkdTcxoT/sodium-fabric-0.8.14%2Bmc1.21.11.jar",
+   "sha1": "4a8733fe544168068d12fa94b2ab03e6c0c7bf91",
+   "sha512": "04c43f9e8534b87a52c42ffd51b0e344d4ef92dc9cc52da33d13af6a18bf74b05380d2027f1e0db982698d0aff274c42741c1e21b313b0cd75ed3af005fc98d9",
+   "size": 1909150,
+   "gameVersions": [
+    "1.21.11"
+   ],
+   "requires": []
+  },
+  {
+   "projectId": "x02cBj9Y",
+   "versionId": "iY0FQLmu",
+   "title": "Status Effect Bars",
+   "iconUrl": "https://cdn.modrinth.com/data/x02cBj9Y/7ee93fac37512f4f04aa82f15deada7b2ca9269f.png",
+   "versionNumber": "1.0.10",
+   "filename": "status-effect-bars-1.0.10.jar",
+   "url": "https://cdn.modrinth.com/data/x02cBj9Y/versions/iY0FQLmu/status-effect-bars-1.0.10.jar",
+   "sha1": "0cd06e44bff08c9a05f7d96249b267fc77c56cc8",
+   "sha512": "dfa0de9ee020c76a0a648b09b848f52afda711d729e79eec495af8526692989b77cb3acd4fd38acb51452b7963dd5a9c2ff1534f23b26fb878c94309f77e7bbc",
+   "size": 47761,
+   "gameVersions": [
+    "1.21.11"
+   ],
+   "requires": []
+  },
+  {
+   "projectId": "SIRG6coC",
+   "versionId": "vjEnWC6C",
+   "title": "Vignette Tweaks (Damage Tint + More)",
+   "iconUrl": "https://cdn.modrinth.com/data/SIRG6coC/32429c583265fc2d52fdbe8081c3513e0779bf8f_96.webp",
+   "versionNumber": "2.1.4+1.21.11",
+   "filename": "vignettetweaks-2.1.4+1.21.11.jar",
+   "url": "https://cdn.modrinth.com/data/SIRG6coC/versions/vjEnWC6C/vignettetweaks-2.1.4%2B1.21.11.jar",
+   "sha1": "ece723b27c92356dfa77200694a2e4978fe130a2",
+   "sha512": "1bb09fa607994f51e0cdfc8de03f6e355f65bfc14271c1fd99ef2374eab88ebd286ea605d7276e53934010266434e32aeb7c691b186445b7c95312b08c2c8c47",
+   "size": 19302,
+   "gameVersions": [
+    "1.21.11"
+   ],
+   "requires": [
+    "P7dR8mSH",
+    "AibBIVmj"
+   ]
+  },
+  {
+   "projectId": "wnEe9KBa",
+   "versionId": "7Cxc2cAR",
+   "title": "Very Many Players (Fabric)",
+   "iconUrl": "https://cdn.modrinth.com/data/wnEe9KBa/0bb4b66e80c6cca9c37f6f1021a94670d6f820dc_96.webp",
+   "versionNumber": "0.2.0+beta.7.227+1.21.11",
+   "filename": "vmp-fabric-mc1.21.11-0.2.0+beta.7.227-all.jar",
+   "url": "https://cdn.modrinth.com/data/wnEe9KBa/versions/7Cxc2cAR/vmp-fabric-mc1.21.11-0.2.0%2Bbeta.7.227-all.jar",
+   "sha1": "6d665e488ea4f301d639cdf9fd4abf3ffdb44e0d",
+   "sha512": "5534a5b0ec88b58f1a395753e4810dde9a8f0f97a88898f4b61e960bd219ec28ea60c6676d7ee24d5b465939a4ff9470520d9015bb9cdb10d9357ff82c36fdab",
+   "size": 416338,
+   "gameVersions": [
+    "1.21.11"
+   ],
+   "requires": []
+  },
+  {
+   "projectId": "9eGKb6K1",
+   "versionId": "CN53keBo",
+   "title": "Simple Voice Chat",
+   "iconUrl": "https://cdn.modrinth.com/data/9eGKb6K1/icon.png",
+   "versionNumber": "fabric-1.21.11-2.6.22",
+   "filename": "voicechat-fabric-1.21.11-2.6.22.jar",
+   "url": "https://cdn.modrinth.com/data/9eGKb6K1/versions/CN53keBo/voicechat-fabric-1.21.11-2.6.22.jar",
+   "sha1": "d607bc579bb5e0488a539ed87e62e91f10d38376",
+   "sha512": "dab29df8577b220e1c2ad97b784c5acb837501c8ba42d83205c085f44b4a6df75bce2477b8c2c7905285d248fd2d195b3dc77f169cb11a226dc2965e23f5859a",
+   "size": 5591115,
+   "gameVersions": [
+    "1.21.11"
+   ],
+   "requires": []
+  },
+  {
+   "projectId": "7P86n6Vg",
+   "versionId": "exxN7KBX",
+   "title": "WalksyLib",
+   "iconUrl": "https://cdn.modrinth.com/data/7P86n6Vg/ae681f3326e26337b61ccb660ffba988565c017d.png",
+   "versionNumber": "2.0.5+1.21.11",
+   "filename": "WalksyLib-2.0.5+1.21.11.jar",
+   "url": "https://cdn.modrinth.com/data/7P86n6Vg/versions/exxN7KBX/WalksyLib-2.0.5%2B1.21.11.jar",
+   "sha1": "dd16e30d163bf6b6ec51b05cc7030c7c39dbb0eb",
+   "sha512": "8da17e37eaa6e389b313af83ecd192318d4903d3ceb684f63d981099c4d77957fb9232ca8f8ca722d25b9283d94e6f5fd2d8f806905f23f8d64c70b27f701916",
+   "size": 1792553,
+   "gameVersions": [
+    "1.21.11"
+   ],
+   "requires": []
+  },
+  {
+   "projectId": "7ZoK90Xo",
+   "versionId": "ZKOItDNB",
+   "title": "Windows Priority Boost",
+   "iconUrl": "https://cdn.modrinth.com/data/7ZoK90Xo/36bb72b148fc5ba4e13b6aad1bddc2554c438877_96.webp",
+   "versionNumber": "1.0.0",
+   "filename": "WindowsPriorityBoost-1.0.0.jar",
+   "url": "https://cdn.modrinth.com/data/7ZoK90Xo/versions/ZKOItDNB/WindowsPriorityBoost-1.0.0.jar",
+   "sha1": "1d069d8c141083ac762451ca48514fb3868a976c",
+   "sha512": "ff6d522295a0d80ead6dbce4d7d4823aa07c6e81110b4835e44f884849665d49f675e5a88f08e23b966e76bbd34cc56f5e54d2a66a2fd8fcdd512c880fa5d2d5",
+   "size": 3130093,
+   "gameVersions": [
+    "rd-160052",
+    "rd-161348",
+    "rd-20090515"
+   ],
+   "requires": []
+  },
+  {
+   "projectId": "eQke7g17",
+   "versionId": "bUVgmMMP",
+   "title": "wWaypoints",
+   "iconUrl": "https://cdn.modrinth.com/data/eQke7g17/5180147f4ba0c450e7fd2a4b7083a448fc127d96.png",
+   "versionNumber": "0.8.1",
+   "filename": "wWaypoints 0.8.1 Fabric 1.21.11.jar",
+   "url": "https://cdn.modrinth.com/data/eQke7g17/versions/bUVgmMMP/wWaypoints%200.8.1%20Fabric%201.21.11.jar",
+   "sha1": "9ca84bb82311f4cd6588f44f4df4f261b0dc89f3",
+   "sha512": "c50bce01def854c624fd6e8054906e1c53e62baabb135590afe36b399af42d2cfdfe22a53599862f319822b1214915653903da97c415156e4f2c243b1d8f549b",
+   "size": 3290807,
+   "gameVersions": [
+    "1.21.11"
+   ],
+   "requires": [
+    "P7dR8mSH"
+   ]
+  },
+  {
+   "projectId": "NcUtCpym",
+   "versionId": "ksfmc45B",
+   "title": "Xaero's World Map",
+   "iconUrl": "https://cdn.modrinth.com/data/NcUtCpym/354080f65407e49f486fcf9c4580e82c45ae63b8_96.webp",
+   "versionNumber": "fabric-1.21.11-1.47.2",
+   "filename": "xaeroworldmap-fabric-1.21.11-1.47.2.jar",
+   "url": "https://cdn.modrinth.com/data/NcUtCpym/versions/ksfmc45B/xaeroworldmap-fabric-1.21.11-1.47.2.jar",
+   "sha1": "2d872b1bda7ba6549802305182a439c51dae1dab",
+   "sha512": "85fba137b461bd6b68dee71468072082d081d8f8ed2ff2edd13bd57dc3d19bbce5ed77856b360a40384e4a6607fbad48c7c232e179a2504491c215817078aad1",
+   "size": 1473335,
+   "gameVersions": [
+    "1.21.11"
+   ],
+   "requires": [
+    "P7dR8mSH"
+   ]
+  },
+  {
+   "projectId": "1eAoo2KR",
+   "versionId": "pHWDw3Vc",
+   "title": "YetAnotherConfigLib (YACL)",
+   "iconUrl": "https://cdn.modrinth.com/data/1eAoo2KR/08c0cd32515e260f4bb20bbc0696510041523f9a_96.webp",
+   "versionNumber": "3.8.2+1.21.11-fabric",
+   "filename": "yet_another_config_lib_v3-3.8.2+1.21.11-fabric.jar",
+   "url": "https://cdn.modrinth.com/data/1eAoo2KR/versions/pHWDw3Vc/yet_another_config_lib_v3-3.8.2%2B1.21.11-fabric.jar",
+   "sha1": "f99cda70903f16dd6927a276150b2762b4d5ab66",
+   "sha512": "392db7d471030cca27483ecf58c626a14cd73d71a18afe6d4173c6b030948b8a925b36e708d4cc2c897dfa3f20a7f23b999fc18aa6d36c156da29037601153ac",
+   "size": 1126948,
+   "gameVersions": [
+    "1.21.11"
+   ],
+   "requires": [
+    "P7dR8mSH"
+   ]
+  }
+ ],
+ "note": "Pinned from the user's mods folder. Animatica was left out: its newest Modrinth build (1.21.5) crashes on 1.21.11, and the 1.21.8 build is not on Modrinth."
+}

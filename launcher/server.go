@@ -34,6 +34,37 @@ type App struct {
 
 	loginMu sync.Mutex
 	login   *DeviceLogin
+
+	profiles  *ProfileStore
+	profileMu sync.Mutex
+}
+
+// switchProfile points the game and mod manager at another profile's folder.
+func (a *App) switchProfile(id string) error {
+	a.profileMu.Lock()
+	defer a.profileMu.Unlock()
+	if a.game.Busy() {
+		return errors.New("close Minecraft and wait for downloads to finish before switching profiles")
+	}
+	if err := a.profiles.Select(id); err != nil {
+		return err
+	}
+	paths := a.paths.withInstance(a.profiles.Dir(id))
+	if err := paths.ensure(); err != nil {
+		return err
+	}
+	a.paths = paths
+	a.mods = newModManager(paths.Mods)
+	a.game.paths = paths
+	a.game.mods = a.mods
+	go func(m *ModManager) {
+		if err := m.EnsureCore(context.Background()); err != nil {
+			logf("core mods for profile %s: %v", id, err)
+		}
+		a.events.Send("state", nil)
+	}(a.mods)
+	a.events.Send("state", nil)
+	return nil
 }
 
 func (a *App) routes() http.Handler {
@@ -90,6 +121,45 @@ func (a *App) routes() http.Handler {
 	api("/api/performance", a.handlePerformance)
 	api("/api/performance/apply", a.handleApplyPerformance)
 	api("/api/open", a.handleOpen)
+	api("/api/profiles", func(r *http.Request) (any, error) {
+		list, active := a.profiles.List()
+		return map[string]any{"profiles": list, "active": active, "templates": templateSummaries()}, nil
+	})
+	api("/api/profiles/select", func(r *http.Request) (any, error) {
+		var in struct{ ID string `json:"id"` }
+		if err := decode(r, &in); err != nil {
+			return nil, err
+		}
+		return nil, a.switchProfile(in.ID)
+	})
+	api("/api/profiles/create", a.handleCreateProfile)
+	api("/api/profiles/rename", func(r *http.Request) (any, error) {
+		var in struct{ ID, Name string }
+		if err := decode(r, &in); err != nil {
+			return nil, err
+		}
+		err := a.profiles.Rename(in.ID, in.Name)
+		a.events.Send("state", nil)
+		return nil, err
+	})
+	api("/api/profiles/delete", func(r *http.Request) (any, error) {
+		var in struct{ ID string `json:"id"` }
+		if err := decode(r, &in); err != nil {
+			return nil, err
+		}
+		if a.game.Busy() {
+			return nil, errors.New("close Minecraft before deleting a profile")
+		}
+		wasActive := a.profiles.ActiveProfile().ID == in.ID
+		if err := a.profiles.Delete(in.ID); err != nil {
+			return nil, err
+		}
+		if wasActive {
+			return nil, a.switchProfile("default")
+		}
+		a.events.Send("state", nil)
+		return nil, nil
+	})
 	api("/api/repair", func(r *http.Request) (any, error) {
 		if err := a.game.Repair(); err != nil {
 			return nil, err
@@ -180,6 +250,7 @@ func (a *App) state() map[string]any {
 		"dataDir":          a.paths.Data,
 		"os":               runtime.GOOS,
 		"testAccount":      isTestBuild(),
+		"profile":          a.profiles.ActiveProfile(),
 	}
 }
 
@@ -259,14 +330,16 @@ func (a *App) play(mode string) {
 			if err != nil {
 				return err
 			}
-			return a.game.PlayOfficial(profile)
+			p := a.profiles.ActiveProfile()
+			return a.game.PlayOfficial(profile, p.ID, p.Name)
 		}()
 		if err != nil {
 			fail(err)
 			return
 		}
 		a.events.Send("progress", nil)
-		a.events.notify("success", "Opening the Minecraft Launcher", "Pick the \"Annoying Client\" profile and press Play")
+		p := a.profiles.ActiveProfile()
+		a.events.notify("success", "Opening the Minecraft Launcher", "Pick the \""+officialName(p.ID, p.Name)+"\" profile and press Play")
 	default:
 		acc, err := a.launchAccount(ctx)
 		if err != nil {
@@ -327,6 +400,59 @@ func (a *App) prepareOfficial(ctx context.Context) error {
 	}
 	a.game.progress(2, 3, Progress{Stage: "Opening the Minecraft Launcher", Fraction: 1})
 	return nil
+}
+
+func templateSummaries() []map[string]any {
+	var out []map[string]any
+	for _, t := range profileTemplates() {
+		out = append(out, map[string]any{"id": t.ID, "name": t.Name, "description": t.Description, "mods": len(t.Mods)})
+	}
+	return out
+}
+
+// handleCreateProfile creates a profile, switches to it and installs its template's mods in the background.
+func (a *App) handleCreateProfile(r *http.Request) (any, error) {
+	var in struct {
+		Name     string `json:"name"`
+		Template string `json:"template"`
+	}
+	if err := decode(r, &in); err != nil {
+		return nil, err
+	}
+	tpl := findTemplate(in.Template)
+	if tpl == nil {
+		return nil, errors.New("unknown profile template")
+	}
+	if a.game.Busy() {
+		return nil, errors.New("close Minecraft before creating a profile")
+	}
+	p, err := a.profiles.Create(in.Name, tpl.ID)
+	if err != nil {
+		return nil, err
+	}
+	if err := a.switchProfile(p.ID); err != nil {
+		return nil, err
+	}
+	if len(tpl.Mods) > 0 {
+		go func() {
+			if err := a.game.begin(); err != nil {
+				a.events.notify("error", "Could not install mods", capitalize(err.Error()))
+				return
+			}
+			defer a.game.end()
+			err := a.mods.InstallPinned(context.Background(), tpl.Mods, a.settings.Get().DownloadThreads, func(pr Progress) {
+				a.events.Send("progress", map[string]any{"stage": "Installing " + tpl.Name + " mods", "fraction": pr.Fraction,
+					"done": pr.Done, "total": pr.Total, "bytes": pr.Bytes, "totalBytes": pr.TotalBytes})
+			})
+			a.events.Send("progress", nil)
+			if err != nil {
+				a.events.notify("error", "Some mods failed to download", capitalize(err.Error()))
+				return
+			}
+			a.events.notify("success", "Profile ready", fmt.Sprintf("%s: %d mods installed", p.Name, len(tpl.Mods)))
+		}()
+	}
+	return p, nil
 }
 
 func (a *App) handleSearch(r *http.Request) (any, error) {
