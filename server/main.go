@@ -25,6 +25,9 @@ func main() {
 	if err != nil {
 		log.Fatalf("cannot open database: %v", err)
 	}
+	if err := store.update(func(*dbFile) error { return nil }); err != nil {
+		log.Printf("WARNING: cannot save the database (%v); sign-ins will fail until DATA points to a writable folder", err)
+	}
 	admins := map[string]bool{}
 	for _, a := range strings.Split(envOr("ADMINS", "theavgjim_"), ",") {
 		if a = strings.ToLower(strings.TrimSpace(a)); a != "" {

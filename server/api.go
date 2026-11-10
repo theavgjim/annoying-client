@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"net"
 	"net/http"
 	"net/url"
@@ -86,6 +87,7 @@ func writeErr(w http.ResponseWriter, err error) {
 		writeJSON(w, ae.status, map[string]string{"error": ae.msg})
 		return
 	}
+	log.Printf("internal error: %v", err)
 	writeJSON(w, 500, map[string]string{"error": "server error"})
 }
 
