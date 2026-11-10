@@ -139,7 +139,7 @@ public class AnnoyingClientGameTest implements FabricClientGameTest {
         check(ctx.computeOnClient(mc -> mc.screen instanceof ClickGuiScreen), "Escape with a search should only clear the search");
 
         // Themes tab: pick Crimson (third preset card) and open the accent color picker.
-        clickTab(ctx, 5);
+        clickTab(ctx, 6);
         ctx.takeScreenshot("annoying-09-clickgui-themes");
         click(ctx, 132 + 2 * 110 + 50, 69 + 20, GLFW.GLFW_MOUSE_BUTTON_LEFT);
         ctx.waitTicks(6);
@@ -151,7 +151,7 @@ public class AnnoyingClientGameTest implements FabricClientGameTest {
         ctx.takeScreenshot("annoying-10-clickgui-color-picker");
 
         // Client tab: create a profile from the text field.
-        clickTab(ctx, 6);
+        clickTab(ctx, 7);
         ctx.takeScreenshot("annoying-11-clickgui-client-tab");
         click(ctx, 132 + 60, 69 + 8, GLFW.GLFW_MOUSE_BUTTON_LEFT);
         ctx.getInput().typeChars("pvp");
@@ -161,10 +161,49 @@ public class AnnoyingClientGameTest implements FabricClientGameTest {
         check(active.equals("pvp"), "Creating a profile should switch to it, active is " + active);
         ctx.takeScreenshot("annoying-12-clickgui-profile-created");
 
+        testModConfigs(ctx);
+
         ctx.getInput().pressKey(GLFW.GLFW_KEY_ESCAPE);
         ctx.waitFor(mc -> mc.screen == null);
         ctx.waitTicks(10);
         ctx.takeScreenshot("annoying-13-hud-crimson-theme");
+    }
+
+    // ---- Mod Configs tab ---------------------------------------------------------------------
+
+    private void testModConfigs(ClientGameTestContext ctx) {
+        clickTab(ctx, 5);
+        ctx.waitTicks(10);
+        ctx.takeScreenshot("annoying-12b-mod-configs");
+        int index = ctx.computeOnClient(mc -> {
+            var mods = com.annoyingclient.modconfig.ModConfigRegistry.mods();
+            for (int i = 0; i < mods.size(); i++) {
+                if (mods.get(i).id().equals("modmenu")) {
+                    return i;
+                }
+            }
+            return -1;
+        });
+        check(index >= 0, "Mod Menu should be listed in the Mod Configs tab");
+        boolean hasScreen = ctx.computeOnClient(mc -> com.annoyingclient.modconfig.ModConfigRegistry.mods().get(index).hasScreen());
+        check(hasScreen, "Mod Menu's settings screen should be found through its entrypoint");
+        boolean hasFiles = ctx.computeOnClient(mc -> !com.annoyingclient.modconfig.ModConfigRegistry.mods().get(index).configFiles().isEmpty());
+        float cardY = 48 + index * (34 + 5);
+        float right = 132 + 324 - 10 - (hasFiles ? 14 : 0);
+        // The Settings button opens Mod Menu's own config screen, with the ClickGUI as its parent.
+        click(ctx, right - 26, cardY + 17, GLFW.GLFW_MOUSE_BUTTON_LEFT);
+        ctx.waitTicks(10);
+        String opened = ctx.computeOnClient(mc -> mc.screen == null ? "none" : mc.screen.getClass().getName());
+        check(!opened.equals(ClickGuiScreen.class.getName()) && !opened.equals("none"), "Settings should open the mod's screen, got " + opened);
+        ctx.takeScreenshot("annoying-12c-mod-settings-screen");
+        ctx.getInput().pressKey(GLFW.GLFW_KEY_ESCAPE);
+        ctx.waitFor(mc -> mc.screen instanceof ClickGuiScreen s && s.isFullyOpen(), 200);
+        ctx.waitTicks(5);
+        if (hasFiles) {
+            click(ctx, 200, cardY + 17, GLFW.GLFW_MOUSE_BUTTON_LEFT); // expand the config file editor
+            ctx.waitTicks(12);
+            ctx.takeScreenshot("annoying-12d-mod-config-file-editor");
+        }
     }
 
     // ---- keybinds, zoom, fullbright, crosshair ------------------------------------------------

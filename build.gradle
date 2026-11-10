@@ -11,7 +11,11 @@ base {
 }
 
 repositories {
-    // Fabric's maven is added by Loom. Add more here only if a dependency needs it.
+    // Fabric's maven is added by Loom. Modrinth's maven is used only for mods in development runs.
+    exclusiveContent {
+        forRepository { maven { name = 'Modrinth'; url = 'https://api.modrinth.com/maven' } }
+        filter { includeGroup 'maven.modrinth' }
+    }
 }
 
 loom {
@@ -38,6 +42,10 @@ dependencies {
     modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
     // Gson is bundled with Minecraft itself, so no extra dependency is needed for configuration.
+
+    // Development runs only (never shipped or required): a real mod with a config screen and a
+    // config file, so the Mod Configs tab can be tested against it.
+    modLocalRuntime "maven.modrinth:modmenu:17.0.1"
 }
 
 processResources {

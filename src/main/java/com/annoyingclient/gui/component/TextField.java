@@ -17,7 +17,7 @@ import java.util.function.IntPredicate;
 /** Single-line text input with cursor, select-all, clipboard support and horizontal scrolling. */
 public class TextField extends UIComponent {
 
-    private final String placeholder;
+    private String placeholder;
     private final int maxLength;
     private final float height;
     private String text = "";
@@ -56,6 +56,10 @@ public class TextField extends UIComponent {
     public TextField icon(Icons.Icon icon) {
         this.icon = icon;
         return this;
+    }
+
+    public void setPlaceholder(String placeholder) {
+        this.placeholder = placeholder;
     }
 
     public String getText() {

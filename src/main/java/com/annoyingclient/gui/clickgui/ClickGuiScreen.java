@@ -1,7 +1,10 @@
 package com.annoyingclient.gui.clickgui;
 
 import com.annoyingclient.AnnoyingClient;
+import com.annoyingclient.gui.component.ModConfigCard;
 import com.annoyingclient.gui.component.ModuleCard;
+import com.annoyingclient.modconfig.ModConfigRegistry;
+import com.annoyingclient.modconfig.ModEntry;
 import com.annoyingclient.gui.component.ProfilePanel;
 import com.annoyingclient.gui.component.SectionHeader;
 import com.annoyingclient.gui.component.SettingComponent;
@@ -45,7 +48,7 @@ import java.util.Map;
 public class ClickGuiScreen extends Screen {
 
     private static final float W = 470;
-    private static final float H = 300;
+    private static final float H = 320;
     private static final float SIDEBAR = 122;
     private static final float HEADER = 40;
     private static final float PAD = 10;
@@ -61,12 +64,14 @@ public class ClickGuiScreen extends Screen {
 
     private final Screen parent;
     private final List<Tab> tabs = new ArrayList<>();
+    private final int modConfigTab;
     private final int themeTab;
     private final int clientTab;
     private int tab;
 
     private final Map<Module, ModuleCard> cards = new IdentityHashMap<>();
     private final List<UIComponent> themeContent = new ArrayList<>();
+    private List<ModConfigCard> modConfigCards;
     private final List<UIComponent> clientContent = new ArrayList<>();
     private final List<UIComponent> visibleContent = new ArrayList<>();
     private final List<Animation> tabHover = new ArrayList<>();
@@ -101,6 +106,8 @@ public class ClickGuiScreen extends Screen {
         for (Category c : Category.values()) {
             tabs.add(new Tab(c.getDisplayName(), iconFor(c), c.getDescription(), c));
         }
+        modConfigTab = tabs.size();
+        tabs.add(new Tab("Mod Configs", Icons.Icon.CONFIG, "Settings for every installed mod", null));
         themeTab = tabs.size();
         tabs.add(new Tab("Themes", Icons.Icon.THEMES, "Presets, colors, fonts and animation", null));
         clientTab = tabs.size();
@@ -238,6 +245,11 @@ public class ClickGuiScreen extends Screen {
         return H - HEADER - 6 - PAD;
     }
 
+    /** Typing searches modules everywhere except the Mod Configs tab, where it filters mods. */
+    private boolean searchingModules() {
+        return searching() && tab != modConfigTab;
+    }
+
     private boolean searching() {
         return !search.getText().isBlank();
     }
@@ -258,9 +270,28 @@ public class ClickGuiScreen extends Screen {
         content.setTarget(1f);
     }
 
+    private List<ModConfigCard> modConfigCards() {
+        if (modConfigCards == null) {
+            modConfigCards = new ArrayList<>();
+            for (ModEntry m : ModConfigRegistry.mods()) {
+                modConfigCards.add(new ModConfigCard(m));
+            }
+        }
+        return modConfigCards;
+    }
+
     private void collectContent() {
         visibleContent.clear();
-        if (searching()) {
+        search.setPlaceholder(tab == modConfigTab ? "Search mods..." : "Search modules...");
+        if (tab == modConfigTab) {
+            String q = search.getText().trim().toLowerCase(java.util.Locale.ROOT);
+            for (ModConfigCard c : modConfigCards()) {
+                if (q.isEmpty() || c.getMod().name().toLowerCase(java.util.Locale.ROOT).contains(q)
+                        || c.getMod().id().toLowerCase(java.util.Locale.ROOT).contains(q)) {
+                    visibleContent.add(c);
+                }
+            }
+        } else if (searching()) {
             for (Module m : AnnoyingClient.modules().search(search.getText())) {
                 visibleContent.add(cards.get(m));
             }
@@ -355,9 +386,9 @@ public class ClickGuiScreen extends Screen {
         TextRenderer.drawScaled(g, "v" + version, 14.5f + TextRenderer.width("C L I E N T", true) * 0.7f + 6, 27, 0.7f, t.textDisabled(), false);
 
         // tabs
-        indicator.setTarget(searching() ? -10 : tab);
+        indicator.setTarget(searchingModules() ? -10 : tab);
         float ind = indicator.update();
-        if (!searching() || ind > -1) {
+        if (!searchingModules() || ind > -1) {
             float iy = tabYFor(ind);
             RenderUtil.roundedRect(g, 8, iy, SIDEBAR - 16, TAB_H, 5, ColorUtil.withAlpha(t.accent(), 46));
             RenderUtil.roundedRect(g, 8, iy + 6, 2.5f, TAB_H - 12, 1.25f, t.accent());
@@ -365,7 +396,7 @@ public class ClickGuiScreen extends Screen {
         for (int i = 0; i < tabs.size(); i++) {
             Tab tb = tabs.get(i);
             float y = tabYFor(i);
-            if (i == themeTab) {
+            if (i == modConfigTab) {
                 RenderUtil.rect(g, 16, y - 6, SIDEBAR - 32, 0.6f, ColorUtil.withAlpha(t.border(), 160));
             }
             boolean hovered = MathUtil.inside(localMouseX, localMouseY, 8, y, SIDEBAR - 16, TAB_H);
@@ -375,7 +406,7 @@ public class ClickGuiScreen extends Screen {
             if (h > 0.01f && i != tab) {
                 RenderUtil.roundedRect(g, 8, y, SIDEBAR - 16, TAB_H, 5, ColorUtil.withAlpha(t.text(), Math.round(14 * h)));
             }
-            boolean selected = i == tab && !searching();
+            boolean selected = i == tab && !searchingModules();
             int color = selected ? t.text() : ColorUtil.lerp(t.textMuted(), t.text(), h);
             Icons.draw(g, tb.icon(), 22 + h * 1.5f, y + TAB_H / 2f, 8, selected ? t.accent() : color);
             TextRenderer.draw(g, tb.name(), 32 + h * 1.5f, y + 7, color);
@@ -418,7 +449,7 @@ public class ClickGuiScreen extends Screen {
 
     private float tabYFor(float index) {
         float y = tabTop() + index * (TAB_H + 2);
-        if (index >= themeTab) {
+        if (index >= modConfigTab) {
             y += 12;
         }
         return y;
@@ -427,7 +458,10 @@ public class ClickGuiScreen extends Screen {
     private void drawHeader(GuiGraphics g, ThemeManager t) {
         String title;
         String subtitle;
-        if (searching()) {
+        if (searching() && tab == modConfigTab) {
+            title = "Mod Configs";
+            subtitle = visibleContent.size() + " of " + modConfigCards().size() + " mods match \"" + search.getText().trim() + "\"";
+        } else if (searching()) {
             title = "Search";
             int results = AnnoyingClient.modules().search(search.getText()).size();
             subtitle = results + (results == 1 ? " module matches" : " modules match") + " \"" + search.getText().trim() + "\"";
@@ -493,7 +527,7 @@ public class ClickGuiScreen extends Screen {
             y += h + CONTENT_GAP;
         }
         if (visibleContent.isEmpty()) {
-            String empty = searching() ? "No modules found" : "Nothing here yet";
+            String empty = tab == modConfigTab ? "No mods match your search" : searching() ? "No modules found" : "Nothing here yet";
             TextRenderer.draw(g, empty, cx + cw / 2f - TextRenderer.width(empty) / 2f, cy + 30, t.textMuted());
         }
         RenderUtil.endScissor(g);
