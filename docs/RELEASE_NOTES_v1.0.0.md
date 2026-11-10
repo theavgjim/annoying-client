@@ -1,6 +1,6 @@
 ## Annoying Client 1.0.0 (Minecraft 1.21.11)
 
-**Download `AnnoyingClient-1.0.0-Windows.zip`**, extract it, and run `AnnoyingClient.exe`.
+**Download [`AnnoyingClient-1.0.0-Windows.zip`](https://github.com/theavgjim/annoying-client/raw/main/docs/download/AnnoyingClient-1.0.0-Windows.zip)**, extract it, and run `AnnoyingClient.exe`.
 
 - **Launcher:** installs Minecraft 1.21.11, Fabric 0.20.1, Java 21 and Annoying Client, then plays through the official Minecraft Launcher.
 - **Mods:** browse and install Fabric mods from Modrinth, with dependencies, updates and enable/disable.

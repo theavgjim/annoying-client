@@ -17,7 +17,8 @@ Screenshots were taken automatically by the in-game test suite (software renderi
 ## Installation
 
 ### Annoying Client Launcher (recommended)
-Download **`AnnoyingClient.exe`** and run it. No install step is needed: it downloads Minecraft 1.21.11, Fabric,
+**[Download AnnoyingClient-1.0.0-Windows.zip](https://github.com/theavgjim/annoying-client/raw/main/docs/download/AnnoyingClient-1.0.0-Windows.zip)**
+(website: https://theavgjim.github.io/annoying-client), extract it, and run **`AnnoyingClient.exe`**. No install step is needed: it downloads Minecraft 1.21.11, Fabric,
 Java 21 and Annoying Client on the first Play. It also has a Modrinth mod browser and a Performance page
 (Sodium, Lithium, FerriteCore, Entity Culling, ImmediatelyFast, FPS presets and memory tuning).
 Press **Play** with *Via Minecraft Launcher* selected; the official launcher opens with the "Annoying Client" profile.
