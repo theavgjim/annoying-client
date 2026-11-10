@@ -1,0 +1,299 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Annoying Client: a free Minecraft launcher and client with a ClickGUI, customizable HUD, Modrinth mod browser and one-click FPS optimization.">
+<link rel="icon" href="img/icon.png">
+<style>html,body{margin:0}body{font-size:14px}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Annoying Client</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a launcher-window hero (copy + download card beside a framed screenshot), then feature rows that alternate image and text, a real 3-step install, FAQ, privacy. Single committed dark look matching the client. */
+:root {
+  color-scheme: dark;
+  --ink: #0a0a12;          /* page ground */
+  --panel: #13131f;        /* cards */
+  --panel-2: #1b1b2b;      /* raised controls */
+  --line: #26263a;         /* hairlines */
+  --text: #ececf5;
+  --muted: #9a9ab3;
+  --violet: #8b5cf6;       /* client accent */
+  --azure: #3b82f6;        /* client secondary accent */
+  --ok: #34d399;
+  --warn: #fbbf24;
+  --display: "Outfit", "Segoe UI", system-ui, sans-serif;
+  --body: "Inter", "Segoe UI", system-ui, sans-serif;
+  --mono: "JetBrains Mono", "Cascadia Mono", Consolas, monospace;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } * { animation: none !important; transition: none !important; } }
+body { background: var(--ink); color: var(--text); font: 16px/1.6 var(--body); }
+a { color: inherit; }
+:focus-visible { outline: 2px solid var(--violet); outline-offset: 3px; border-radius: 6px; }
+
+.wrap { max-width: 1120px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+
+/* header */
+header { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: color-mix(in srgb, var(--ink) 86%, transparent); backdrop-filter: blur(10px); border-bottom: 1px solid var(--line); }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--ink); }
+.bar { display: flex; align-items: center; gap: 24px; padding-block: 14px; }
+.logo { display: flex; align-items: center; gap: 10px; text-decoration: none; font: 800 17px/1 var(--display); letter-spacing: .06em; }
+.logo img { width: 30px; height: 30px; border-radius: 8px; }
+.logo span { color: var(--violet); }
+.bar nav { display: flex; gap: 22px; margin-left: auto; font-size: 14px; color: var(--muted); }
+.bar nav a { text-decoration: none; }
+.bar nav a:hover { color: var(--text); }
+@media (max-width: 640px) { .bar nav { display: none; } }
+
+/* hero */
+.hero { padding-block: 64px 40px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); gap: 48px; align-items: center; }
+@media (max-width: 900px) { .hero { grid-template-columns: minmax(0, 1fr); padding-block: 36px 24px; } }
+.stack { font: 500 13px/1 var(--mono); color: var(--muted); letter-spacing: .02em; display: flex; flex-wrap: wrap; gap: 8px; }
+.stack b { color: var(--text); font-weight: 500; }
+h1 { font: 800 clamp(44px, 7vw, 76px)/.95 var(--display); letter-spacing: .01em; margin: 18px 0 16px; text-wrap: balance; }
+h1 em { font-style: normal; color: transparent; background: linear-gradient(90deg, var(--violet), var(--azure)); -webkit-background-clip: text; background-clip: text; }
+.lead { color: var(--muted); font-size: 18px; max-width: 34em; margin: 0 0 28px; }
+
+.dl { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 20px; max-width: 480px; display: grid; gap: 14px; }
+.dl-btn { display: flex; align-items: center; justify-content: center; gap: 12px; width: 100%; border: 0; cursor: pointer; padding: 16px 20px; border-radius: 12px; color: #fff; font: 700 18px/1 var(--display); letter-spacing: .04em; background: linear-gradient(90deg, var(--violet), var(--azure)); box-shadow: 0 12px 32px -12px color-mix(in srgb, var(--violet) 80%, transparent); transition: transform .15s, filter .15s; }
+.dl-btn:hover { transform: translateY(-1px); filter: brightness(1.08); }
+.dl-btn { text-decoration: none; }
+.dl-btn[aria-disabled="true"] { cursor: default; filter: saturate(.45) brightness(.75); transform: none; box-shadow: none; }
+.dl-btn svg { width: 22px; height: 22px; flex: none; }
+.dl-meta { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 13.5px; color: var(--muted); }
+.dl-meta b { color: var(--text); font-weight: 600; }
+.status { font-size: 13.5px; min-height: 1.4em; color: var(--muted); }
+.status.ok { color: var(--ok); }
+.status.warn { color: var(--warn); }
+.sha { display: grid; gap: 6px; font-size: 12.5px; color: var(--muted); }
+.sha-row { display: flex; gap: 8px; align-items: center; min-width: 0; }
+.sha code { font: 12px/1.4 var(--mono); color: var(--text); background: var(--ink); border: 1px solid var(--line); border-radius: 8px; padding: 6px 8px; overflow-x: auto; white-space: nowrap; flex: 1; min-width: 0; }
+.copy { border: 1px solid var(--line); background: var(--panel-2); color: var(--text); border-radius: 8px; padding: 6px 10px; font: 500 12.5px/1 var(--body); cursor: pointer; flex: none; }
+.copy:hover { border-color: #3a3a55; }
+
+.shot { margin: 0; border-radius: 14px; overflow: hidden; border: 1px solid var(--line); background: var(--panel); box-shadow: 0 30px 80px -30px #000, 0 0 0 1px #ffffff08 inset; }
+.shot-chrome { display: flex; align-items: center; gap: 7px; padding: 10px 14px; border-bottom: 1px solid var(--line); font: 500 12px/1 var(--mono); color: var(--muted); }
+.shot-chrome i { width: 10px; height: 10px; border-radius: 50%; background: var(--panel-2); display: block; }
+.shot-chrome span { margin-left: 8px; }
+.shot img { display: block; width: 100%; height: auto; }
+
+/* sections */
+section { padding-block: 56px; border-top: 1px solid var(--line); }
+.eyebrow { font: 600 12px/1 var(--mono); text-transform: uppercase; letter-spacing: .14em; color: var(--violet); }
+h2 { font: 700 clamp(28px, 4vw, 40px)/1.1 var(--display); margin: 12px 0 14px; text-wrap: balance; }
+h3 { font: 700 22px/1.2 var(--display); margin: 0 0 10px; }
+.intro { color: var(--muted); max-width: 40em; margin: 0 0 36px; }
+
+.feature { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr); gap: 40px; align-items: center; padding-block: 22px; }
+.feature.flip { grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); }
+.feature.flip .feature-text { order: 2; }
+@media (max-width: 860px) { .feature, .feature.flip { grid-template-columns: minmax(0, 1fr); gap: 18px; } .feature.flip .feature-text { order: 0; } }
+.feature-text p { color: var(--muted); margin: 0 0 14px; }
+.ticks { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; font-size: 15px; }
+.ticks li { display: flex; gap: 10px; }
+.ticks li::before { content: ""; flex: none; width: 7px; height: 7px; margin-top: .62em; border-radius: 2px; background: var(--violet); transform: rotate(45deg); }
+.keys { display: flex; flex-wrap: wrap; gap: 10px 18px; margin-top: 16px; font-size: 14.5px; color: var(--muted); }
+kbd { font: 500 12.5px/1 var(--mono); color: var(--text); background: var(--panel-2); border: 1px solid var(--line); border-bottom-width: 3px; border-radius: 7px; padding: 5px 9px; margin-right: 6px; }
+.gallery { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.gallery img { width: 100%; height: auto; border-radius: 10px; border: 1px solid var(--line); display: block; }
+@media (max-width: 560px) { .gallery { grid-template-columns: minmax(0, 1fr); } }
+
+/* install */
+.steps { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; counter-reset: step; }
+@media (max-width: 860px) { .steps { grid-template-columns: minmax(0, 1fr); } }
+.steps li { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 20px; counter-increment: step; }
+.steps li::before { content: counter(step); display: grid; place-items: center; width: 30px; height: 30px; border-radius: 9px; background: var(--panel-2); color: var(--violet); font: 700 15px/1 var(--display); margin-bottom: 14px; }
+.steps p { color: var(--muted); margin: 6px 0 0; font-size: 15px; }
+.req { margin-top: 22px; display: flex; flex-wrap: wrap; gap: 8px 22px; font-size: 14px; color: var(--muted); }
+.req b { color: var(--text); font-weight: 600; }
+
+/* faq */
+.faq { display: grid; gap: 10px; max-width: 820px; }
+details { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 0 18px; }
+summary { cursor: pointer; list-style: none; padding-block: 16px; font: 600 17px/1.3 var(--display); display: flex; justify-content: space-between; gap: 16px; }
+summary::-webkit-details-marker { display: none; }
+summary::after { content: "+"; color: var(--violet); font-weight: 700; }
+details[open] summary::after { content: "\2212"; }
+details p, details ul { color: var(--muted); margin: 0 0 16px; }
+details ul { padding-left: 20px; }
+
+.privacy { max-width: 820px; color: var(--muted); }
+.privacy p { margin: 0 0 12px; }
+.privacy strong { color: var(--text); }
+
+footer { border-top: 1px solid var(--line); padding-block: 28px 40px; font-size: 13.5px; color: var(--muted); }
+footer .wrap { display: flex; flex-wrap: wrap; gap: 10px 28px; justify-content: space-between; }
+</style>
+</head>
+<body>
+
+
+<header>
+  <div class="wrap bar">
+    <a class="logo" href="#top"><img src="img/icon.png" alt="">ANNOYING <span>CLIENT</span></a>
+    <nav>
+      <a href="#features">Features</a>
+      <a href="#install">Install</a>
+      <a href="#faq">FAQ</a>
+      <a href="#privacy">Privacy</a>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+  <div class="wrap hero">
+    <div>
+      <div class="stack"><b>v1.0.0</b><span>Minecraft 1.21.11</span><span>&middot;</span><span>Fabric 0.20.1</span><span>&middot;</span><span>Java 21</span></div>
+      <h1>ANNOYING <em>CLIENT</em></h1>
+      <p class="lead">A Minecraft launcher and client in one. Press Play to install the game, a ClickGUI and HUD you can customize, and the best FPS mods, all set up for you.</p>
+      <div class="dl">
+        <a class="dl-btn" id="download" href="https://github.com/theavgjim/annoying-client/releases/latest/download/AnnoyingClient-1.0.0-Windows.zip">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0l-5-5m5 5l5-5M4 19h16"/></svg>
+          Download for Windows
+        </a>
+        <div class="dl-meta"><span><b>AnnoyingClient-1.0.0-Windows.zip</b></span><span>7.2 MB</span><span>Windows 10 / 11, 64-bit</span></div>
+        <div class="status" id="status">Free download from <a href="https://github.com/theavgjim/annoying-client/releases/latest">GitHub Releases</a>. Source code on <a href="https://github.com/theavgjim/annoying-client">GitHub</a>.</div>
+        <div class="sha">
+          <span>SHA-256 checksum</span>
+          <div class="sha-row"><code id="sha">634002592fefe31608340f3f3124a1210ef45c1a108d3f554e637ea84bd3e8e5</code><button class="copy" id="copy-sha" type="button">Copy</button></div>
+        </div>
+      </div>
+    </div>
+    <figure class="shot">
+      <div class="shot-chrome"><i></i><i></i><i></i><span>Annoying Client</span></div>
+      <img src="img/launcher-play.jpg" width="1200" height="760" alt="The Annoying Client launcher home screen with the Play button">
+    </figure>
+  </div>
+
+  <section id="features">
+    <div class="wrap">
+      <div class="eyebrow">What you get</div>
+      <h2>Launcher, client and FPS boost</h2>
+      <p class="intro">Everything is visual or quality-of-life. No cheats, no exploits and no automation, so it is fair to use on servers that allow client mods.</p>
+
+      <div class="feature">
+        <div class="feature-text">
+          <h3>A launcher that sets everything up</h3>
+          <p>The first Play downloads and checks Minecraft, Fabric, Java 21 and the client. After that, the game starts in seconds.</p>
+          <ul class="ticks">
+            <li>Play through the official Minecraft Launcher with your own Microsoft account</li>
+            <li>Browse and install Fabric mods from Modrinth, with dependencies handled for you</li>
+            <li>Turn mods on and off, update them all at once, and watch the live game console</li>
+          </ul>
+        </div>
+        <figure class="shot"><img src="img/launcher-mods.jpg" width="1200" height="760" alt="Mod browser showing Modrinth search results"></figure>
+      </div>
+
+      <div class="feature flip">
+        <div class="feature-text">
+          <h3>Higher FPS in one click</h3>
+          <p>Choose Max FPS, Balanced or Quality video settings, and install the performance mods most players rely on.</p>
+          <ul class="ticks">
+            <li>Sodium, Lithium, FerriteCore, Entity Culling and ImmediatelyFast</li>
+            <li>A memory slider that recommends the right amount for your PC</li>
+            <li>Tuned Java garbage collection to cut lag spikes</li>
+          </ul>
+        </div>
+        <figure class="shot"><img src="img/launcher-performance.jpg" width="1200" height="760" alt="Performance page with video presets and optimization mods"></figure>
+      </div>
+
+      <div class="feature">
+        <div class="feature-text">
+          <h3>Your ClickGUI and HUD in game</h3>
+          <p>A full in-game menu with five themes, a color picker and profiles, plus nine HUD elements you can drag anywhere.</p>
+          <ul class="ticks">
+            <li>FPS, coordinates, keystrokes, armor, CPS, ping, clock, watermark and module list</li>
+            <li>Zoom, Fullbright, a custom crosshair, screenshot manager and more</li>
+            <li>Settings save automatically and survive restarts</li>
+          </ul>
+          <div class="keys"><span><kbd>Right Shift</kbd>Menu</span><span><kbd>C</kbd>Zoom</span><span><kbd>F2</kbd>Screenshot</span></div>
+        </div>
+        <div class="gallery">
+          <img src="img/clickgui-settings.jpg" width="1200" height="675" alt="ClickGUI with module settings expanded">
+          <img src="img/themes-color-picker.jpg" width="1200" height="675" alt="Theme presets and color picker">
+          <img src="img/hud.jpg" width="1200" height="675" alt="HUD elements in game">
+          <img src="img/hud-editor.jpg" width="1200" height="675" alt="Drag-and-drop HUD editor">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="install">
+    <div class="wrap">
+      <div class="eyebrow">Install</div>
+      <h2>Up and running in three steps</h2>
+      <ol class="steps">
+        <li><h3>Download and extract</h3><p>Download the zip above, right-click it and choose <b>Extract All</b>.</p></li>
+        <li><h3>Run AnnoyingClient.exe</h3><p>If Windows shows "Windows protected your PC", click <b>More info</b>, then <b>Run anyway</b>.</p></li>
+        <li><h3>Press Play</h3><p>The official Minecraft Launcher opens with the Annoying Client profile. In game, press <kbd>Right Shift</kbd>.</p></li>
+      </ol>
+      <div class="req"><span><b>Needs:</b> Windows 10 or 11 (64-bit)</span><span>Minecraft: Java Edition (bought)</span><span>Official Minecraft Launcher</span><span>About 1 GB of disk space</span></div>
+    </div>
+  </section>
+
+  <section id="faq">
+    <div class="wrap">
+      <div class="eyebrow">Questions</div>
+      <h2>FAQ</h2>
+      <div class="faq">
+        <details><summary>Why does Windows warn me about the file?</summary>
+          <p>The launcher is not code-signed yet, so SmartScreen does not recognize it. Click "More info" and then "Run anyway". You can compare the file's SHA-256 checksum with the one shown above to be sure it was not changed.</p></details>
+        <details><summary>Do I need to own Minecraft?</summary>
+          <p>Yes. You sign in with your own Microsoft account through the official Minecraft Launcher. There is no offline or cracked mode.</p></details>
+        <details><summary>What is "Direct" launch?</summary>
+          <p>Direct launch signs you in from Annoying Client itself, without opening the official launcher. It becomes available once Mojang approves the launcher's Microsoft application. Until then, use "Via Minecraft Launcher", which works for everyone.</p></details>
+        <details><summary>Can I get banned for using it?</summary>
+          <p>Annoying Client has no cheats, but every server sets its own rules. Some servers do not allow features such as zoom or fullbright, so check a server's rules before you play there.</p></details>
+        <details><summary>Where are my files?</summary>
+          <ul>
+            <li>Launcher, game files and Java: <code>%APPDATA%\.annoyingclient</code></li>
+            <li>Worlds, screenshots and mods: <code>%APPDATA%\.annoyingclient\instance</code></li>
+          </ul></details>
+        <details><summary>What else is in the zip?</summary>
+          <p><b>AnnoyingClient-Installer.exe</b> only adds the client to the official launcher, without the launcher app. <b>annoying-client-1.0.0+mc1.21.11.jar</b> is the mod by itself, for manual Fabric installs (it needs Fabric API).</p></details>
+      </div>
+    </div>
+  </section>
+
+  <section id="privacy">
+    <div class="wrap">
+      <div class="eyebrow">Privacy</div>
+      <h2>Privacy policy</h2>
+      <div class="privacy">
+        <p><strong>No tracking.</strong> Annoying Client does not collect analytics, usage statistics or personal data.</p>
+        <p><strong>Sign-in tokens.</strong> If you sign in for Direct launch, your Microsoft and Minecraft tokens are stored only on your computer, encrypted with Windows DPAPI. They are sent only to Microsoft, Xbox Live and Minecraft services to sign you in and start the game. Sign out in the launcher, or delete <code>%APPDATA%\.annoyingclient\account.dat</code>, to remove them.</p>
+        <p><strong>Network use.</strong> The launcher connects to Mojang (game files and Java), Fabric (the mod loader) and Modrinth (mods you choose to install). Nothing else.</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>Annoying Client 1.0.0 &middot; Free, MIT licensed</span>
+    <span>Not an official Minecraft product. Not approved by or associated with Mojang or Microsoft.</span>
+  </div>
+</footer>
+
+<script>
+(function () {
+  document.getElementById("copy-sha").addEventListener("click", function () {
+    var code = document.getElementById("sha");
+    var b = this;
+    function selectIt() {
+      var r = document.createRange(); r.selectNodeContents(code);
+      var s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(code.textContent).then(function () { b.textContent = "Copied"; setTimeout(function () { b.textContent = "Copy"; }, 1500); }, selectIt);
+    } else { selectIt(); }
+  });
+})();
+</script>
+
+</body>
+</html>
