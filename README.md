@@ -17,7 +17,7 @@ Screenshots were taken automatically by the in-game test suite (software renderi
 ## Installation
 
 ### Annoying Client Launcher (recommended)
-**[Download AnnoyingClient-1.0.0-Windows.zip](https://github.com/theavgjim/annoying-client/raw/main/docs/download/AnnoyingClient-1.0.0-Windows.zip)**
+**[Download AnnoyingClient-1.1.0-Windows.zip](https://github.com/theavgjim/annoying-client/raw/main/docs/download/AnnoyingClient-Windows.zip)**
 (website: https://theavgjim.github.io/annoying-client), extract it, and run **`AnnoyingClient.exe`**. No install step is needed: it downloads Minecraft 1.21.11, Fabric,
 Java 21 and Annoying Client on the first Play. It also has a Modrinth mod browser and a Performance page
 (Sodium, Lithium, FerriteCore, Entity Culling, ImmediatelyFast, FPS presets and memory tuning).
@@ -41,7 +41,7 @@ Click *More info > Run anyway*. Its source is in `installer/` and it is rebuilt 
 ### Manual installation
 1. Install [Fabric Loader](https://fabricmc.net/use/installer/) **0.20.1 or newer** for **Minecraft 1.21.11**.
 2. Download [Fabric API](https://modrinth.com/mod/fabric-api) for 1.21.11 (0.141.6 or newer).
-3. Put `annoying-client-1.0.0+mc1.21.11.jar` **and** the Fabric API JAR into your `.minecraft/mods` folder.
+3. Put `annoying-client-1.1.0+mc1.21.11.jar` **and** the Fabric API JAR into your `.minecraft/mods` folder.
 4. Start the *fabric-loader-1.21.11* profile in the Minecraft Launcher.
 5. Press **Right Shift** (or click the *Annoying Client* button on the title screen) to open the ClickGUI.
 
@@ -93,7 +93,7 @@ from the Elements panel.
 | Render | No Hurt Cam, Low Fire |
 | HUD | Watermark, Module List, FPS Display, Ping Display, CPS Display, Coordinates, Clock, Keystrokes, Armor HUD |
 | Utility | ClickGUI, HUD Editor, Notifications, Profile Switcher, Theme Switcher |
-| Visual | Fullbright, Custom Crosshair, Zoom, HUD Colors, Screenshot Manager |
+| Visual | Fullbright, Custom Crosshair, Zoom, HUD Colors, Screenshot Manager, Cosmetics |
 | Miscellaneous | Background FPS |
 
 - **Fullbright** raises the gamma used for the lightmap while it is enabled, with a fade. Your saved
@@ -109,6 +109,26 @@ from the Elements panel.
 - **Background FPS** caps the frame rate while the window is unfocused.
 
 Everything is visual or quality-of-life. There are no cheats, anti-cheat bypasses, exploits or gameplay automation.
+
+### Mod Configs (new in 1.1.0)
+A ClickGUI tab listing every installed mod with its icon, version and authors. **Settings** opens the
+mod's own settings screen (any mod that supports Mod Menu, without needing Mod Menu). Expanding a mod
+shows its config files (`.json`, `.properties`, simple `.toml`) as switches and text fields you can edit
+and save. A `.bak` backup is written before the first save.
+
+### Wardrobe and cosmetics (new in 1.1.0)
+Capes (7 HD designs, rendered by vanilla's own cape and elytra code) and particle trails (hearts,
+flames, sparkles, music notes), bought with coins and visible to other Annoying Client players.
+New players get 100 coins and the Annoying Cape; everyone can claim 50 coins a day.
+
+Cosmetics are stored on the **cosmetics server** in [`server/`](server/), which you host yourself
+(see its README). Players sign in to it the same way Minecraft servers verify players, through Mojang,
+so nobody can pretend to be someone else. Without a server, the Wardrobe works as a preview only you see.
+
+**Admins** (the owner `theavgjim_` by default, set with the server's `ADMINS` variable) get admin tools
+in the Wardrobe: give or take coins, give or remove cosmetics, make or remove admins, announce to all
+players and list players. The server checks every admin action and keeps an audit log. Admin powers
+are limited to the client's own cosmetics and coins; they cannot control anyone's game or computer.
 
 ### Themes
 Five presets: **Midnight Purple, Dark Blue, Crimson, Emerald, Monochrome**. You can customize the

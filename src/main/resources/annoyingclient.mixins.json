@@ -4,6 +4,7 @@
   "package": "com.annoyingclient.mixin",
   "compatibilityLevel": "JAVA_21",
   "client": [
+    "AbstractClientPlayerMixin",
     "FramerateLimitTrackerMixin",
     "GameRendererMixin",
     "GuiMixin",

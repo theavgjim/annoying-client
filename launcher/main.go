@@ -24,7 +24,7 @@ import (
 	"time"
 )
 
-const launcherVersion = "1.0.0"
+const launcherVersion = "1.1.0"
 
 var logger = log.New(os.Stderr, "", log.LstdFlags)
 

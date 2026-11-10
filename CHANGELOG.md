@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.1.0 (Minecraft 1.21.11)
+
+- **Launcher profiles:** separate game folders per profile, with a "1.21.11 optimized" template of 50
+  pinned, checksum-verified Modrinth mods.
+- **Mod Configs tab:** every installed mod with its icon; opens mods' own settings screens through the
+  Mod Menu entrypoint (Mod Menu not required) and edits .json/.properties/.toml config files in place.
+- **Cosmetics:** 7 HD capes and 4 particle trails, a Wardrobe tab with a turnable player preview, coins
+  with a daily reward, and admin tools (coins, cosmetics, roles, announcements).
+- **Cosmetics server** (`server/`): Go, Mojang-verified sign-in, JSON database, audit log, Docker image.
+- The ClickGUI window is 20 px taller to fit the new tabs.
+
 ## 1.0.0 — Minecraft 1.21.11
 
 First release of ANNOYING CLIENT.

@@ -82,6 +82,7 @@ public class AnnoyingClientGameTest implements FabricClientGameTest {
             ctx.getInput().releaseKey(GLFW.GLFW_KEY_W);
 
             testClickGui(ctx);
+            testCosmetics(ctx);
             testKeybindAndZoom(ctx, world);
             testHudEditor(ctx);
             testConfig(ctx);
@@ -139,7 +140,7 @@ public class AnnoyingClientGameTest implements FabricClientGameTest {
         check(ctx.computeOnClient(mc -> mc.screen instanceof ClickGuiScreen), "Escape with a search should only clear the search");
 
         // Themes tab: pick Crimson (third preset card) and open the accent color picker.
-        clickTab(ctx, 6);
+        clickTab(ctx, 7);
         ctx.takeScreenshot("annoying-09-clickgui-themes");
         click(ctx, 132 + 2 * 110 + 50, 69 + 20, GLFW.GLFW_MOUSE_BUTTON_LEFT);
         ctx.waitTicks(6);
@@ -151,7 +152,7 @@ public class AnnoyingClientGameTest implements FabricClientGameTest {
         ctx.takeScreenshot("annoying-10-clickgui-color-picker");
 
         // Client tab: create a profile from the text field.
-        clickTab(ctx, 7);
+        clickTab(ctx, 8);
         ctx.takeScreenshot("annoying-11-clickgui-client-tab");
         click(ctx, 132 + 60, 69 + 8, GLFW.GLFW_MOUSE_BUTTON_LEFT);
         ctx.getInput().typeChars("pvp");
@@ -175,6 +176,11 @@ public class AnnoyingClientGameTest implements FabricClientGameTest {
         clickTab(ctx, 5);
         ctx.waitTicks(10);
         ctx.takeScreenshot("annoying-12b-mod-configs");
+        int listed = ctx.computeOnClient(mc -> com.annoyingclient.modconfig.ModConfigRegistry.mods().size());
+        check(listed > 0, "The Mod Configs tab should list the installed mods");
+        if (!net.fabricmc.loader.api.FabricLoader.getInstance().isModLoaded("modmenu")) {
+            return; // the production test run has no Mod Menu; development runs check its settings screen
+        }
         int index = ctx.computeOnClient(mc -> {
             var mods = com.annoyingclient.modconfig.ModConfigRegistry.mods();
             for (int i = 0; i < mods.size(); i++) {
@@ -204,6 +210,102 @@ public class AnnoyingClientGameTest implements FabricClientGameTest {
             ctx.waitTicks(12);
             ctx.takeScreenshot("annoying-12d-mod-config-file-editor");
         }
+    }
+
+    // ---- cosmetics, wardrobe and admin tools ---------------------------------------------------
+
+    /** Runs only when a cosmetics server is given in ANNOYING_COSMETICS_URL (the build script starts a local one). */
+    private void testCosmetics(ClientGameTestContext ctx) {
+        String url = System.getenv("ANNOYING_COSMETICS_URL");
+        if (url == null || url.isBlank()) {
+            return;
+        }
+        var cos = ctx.computeOnClient(mc -> AnnoyingClient.cosmetics());
+        // Preview mode first: no server set.
+        ctx.getInput().pressKey(GLFW.GLFW_KEY_RIGHT_SHIFT);
+        ctx.waitFor(mc -> mc.screen instanceof ClickGuiScreen s && s.isFullyOpen());
+        clickTab(ctx, 6);
+        ctx.waitTicks(10);
+        ctx.takeScreenshot("annoying-21-wardrobe-preview-mode");
+
+        ctx.runOnClient(mc -> AnnoyingClient.modules().get(com.annoyingclient.module.impl.visual.CosmeticsModule.class).setServerUrl(url));
+        ctx.waitFor(mc -> cos.status() == com.annoyingclient.cosmetics.CosmeticsManager.Status.SIGNED_IN
+                || cos.status() == com.annoyingclient.cosmetics.CosmeticsManager.Status.ERROR, 400);
+        check(cos.status() == com.annoyingclient.cosmetics.CosmeticsManager.Status.SIGNED_IN, "Should sign in to the cosmetics server: " + cos.error());
+        // The development run's player (Player0) is in ADMINS; production runs use a random name and must NOT be admin.
+        String playerName = ctx.computeOnClient(mc -> mc.getUser().getName());
+        boolean expectAdmin = playerName.equals("Player0");
+        check(cos.profile().admin() == expectAdmin, playerName + " admin=" + cos.profile().admin() + ", expected " + expectAdmin);
+        int start = cos.profile().coins();
+
+        // Daily reward through the button.
+        ctx.waitTicks(10);
+        click(ctx, 132 + 324 - 76 + 34, 48 + 20, GLFW.GLFW_MOUSE_BUTTON_LEFT);
+        ctx.waitFor(mc -> cos.profile().coins() == start + 50, 200);
+
+        // Buy Monochrome (100 coins) by clicking its card twice, then equip it with a third click.
+        int index = -1;
+        for (int i = 0; i < cos.catalog().size(); i++) {
+            if (cos.catalog().get(i).id().equals("cape_mono")) {
+                index = i;
+            }
+        }
+        float gridX = 132 + 112 + 10;
+        float cardW = (324 - 112 - 10 - 6) / 2f;
+        float cx = gridX + (index % 2) * (cardW + 6) + cardW / 2f;
+        float cy = 48 + 40 + 10 + (index / 2) * (50 + 6) + 25;
+        click(ctx, cx, cy, GLFW.GLFW_MOUSE_BUTTON_LEFT);
+        click(ctx, cx, cy, GLFW.GLFW_MOUSE_BUTTON_LEFT);
+        ctx.waitFor(mc -> cos.profile().owned().contains("cape_mono"), 200);
+        check(cos.profile().coins() == start + 50 - 100, "Buying should cost 100 coins, have " + cos.profile().coins());
+        ctx.waitTicks(4);
+        click(ctx, cx, cy, GLFW.GLFW_MOUSE_BUTTON_LEFT);
+        ctx.waitFor(mc -> "cape_mono".equals(cos.profile().equipped().get("cape")), 200);
+
+        String[] err = {"pending"};
+        if (!expectAdmin) {
+            // A regular player's admin requests must be refused by the server.
+            ctx.runOnClient(mc -> cos.admin("coins", java.util.Map.of("player", playerName, "amount", 1000), e -> err[0] = e == null ? "" : e));
+            ctx.waitFor(mc -> !err[0].equals("pending"), 200);
+            check(err[0].toLowerCase(java.util.Locale.ROOT).contains("admins only"), "Non-admin coin grant should be refused, got: " + err[0]);
+            check(cos.profile().coins() == start + 50 - 100, "Coins must not change after a refused admin request");
+            ctx.getInput().pressKey(GLFW.GLFW_KEY_ESCAPE);
+            ctx.waitFor(mc -> mc.screen == null);
+            return;
+        }
+        // Admin tools: give yourself coins and the galaxy cape through the server.
+        ctx.runOnClient(mc -> cos.admin("coins", java.util.Map.of("player", "Player0", "amount", 1000), e -> err[0] = e == null ? "" : e));
+        ctx.waitFor(mc -> !err[0].equals("pending"), 200);
+        check(err[0].isEmpty(), "Admin coins failed: " + err[0]);
+        err[0] = "pending";
+        ctx.runOnClient(mc -> cos.admin("cosmetic", java.util.Map.of("player", "Player0", "id", "cape_galaxy", "give", true), e -> err[0] = e == null ? "" : e));
+        ctx.waitFor(mc -> !err[0].equals("pending"), 200);
+        ctx.waitFor(mc -> cos.profile().owned().contains("cape_galaxy"), 200);
+        err[0] = "pending";
+        ctx.runOnClient(mc -> cos.equip("trail", null, e -> {}));
+        ctx.runOnClient(mc -> cos.admin("cosmetic", java.util.Map.of("player", "Player0", "id", "trail_sparkle", "give", true), e -> err[0] = e == null ? "" : e));
+        ctx.waitFor(mc -> cos.profile().owned().contains("trail_sparkle"), 200);
+        String[] eq = {"pending"};
+        ctx.runOnClient(mc -> cos.equip("trail", "trail_sparkle", e -> eq[0] = e == null ? "" : e));
+        ctx.waitFor(mc -> !eq[0].equals("pending"), 200);
+        ctx.waitTicks(10);
+        ctx.takeScreenshot("annoying-22-wardrobe-signed-in");
+        ctx.runOnClient(mc -> ((ClickGuiScreen) mc.screen).scrollContent(400));
+        ctx.waitTicks(15);
+        ctx.takeScreenshot("annoying-23-wardrobe-admin-tools");
+        ctx.getInput().pressKey(GLFW.GLFW_KEY_ESCAPE);
+        ctx.waitFor(mc -> mc.screen == null);
+
+        // Third person: the equipped cape is drawn by vanilla's cape renderer; walk to show the trail.
+        ctx.runOnClient(mc -> mc.options.setCameraType(net.minecraft.client.CameraType.THIRD_PERSON_FRONT));
+        ctx.runOnClient(mc -> mc.player.setYRot(mc.player.getYRot() + 180));
+        ctx.getInput().holdKey(GLFW.GLFW_KEY_S);
+        ctx.waitTicks(25);
+        ctx.getInput().releaseKey(GLFW.GLFW_KEY_S);
+        ctx.runOnClient(mc -> mc.options.setCameraType(net.minecraft.client.CameraType.THIRD_PERSON_BACK));
+        ctx.waitTicks(8);
+        ctx.takeScreenshot("annoying-24-cape-third-person");
+        ctx.runOnClient(mc -> mc.options.setCameraType(net.minecraft.client.CameraType.FIRST_PERSON));
     }
 
     // ---- keybinds, zoom, fullbright, crosshair ------------------------------------------------

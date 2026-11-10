@@ -19,6 +19,15 @@ manages mods from Modrinth, optimizes FPS, and starts the game.
 - **Settings:** launch mode, window size, fullscreen, Java path, extra JVM arguments, download threads, client ID,
   folder shortcuts and "Repair game files".
 
+## Profiles
+Every profile has its own game folder (mods, settings, worlds, screenshots). **+ New profile** offers
+two templates: *Annoying Client only*, and *1.21.11 optimized*, which installs 50 exact Modrinth files
+(checksums verified): Sodium, Sodium Extra, Reese's Sodium Options, Iris, Lithium, FerriteCore,
+Entity Culling, ImmediatelyFast, ModernFix, ScalableLux, VMP, Continuity, Entity Model/Texture/Sound
+Features, Xaero's World Map, wWaypoints, Simple Voice Chat, Mod Menu, YACL, Cloth Config, OneConfig,
+Polydium, Resourcify, Not Enough Crashes, Shulker Box Tooltip and more. Animatica is not included:
+no build for 1.21.11 is on Modrinth, and the newest one (1.21.5) crashes the game.
+
 ## How it works
 The launcher is a Go program (standard library only) with an embedded web UI. It listens on `127.0.0.1` with a
 random port and a per-session secret token, and opens the UI as an app window through Microsoft Edge (or Chrome).

@@ -11,6 +11,7 @@ import com.annoyingclient.gui.component.SettingComponent;
 import com.annoyingclient.gui.component.TextField;
 import com.annoyingclient.gui.component.ThemePresetGrid;
 import com.annoyingclient.gui.component.UIComponent;
+import com.annoyingclient.gui.component.WardrobePanel;
 import com.annoyingclient.hud.HudEditorScreen;
 import com.annoyingclient.module.Category;
 import com.annoyingclient.module.Module;
@@ -65,6 +66,7 @@ public class ClickGuiScreen extends Screen {
     private final Screen parent;
     private final List<Tab> tabs = new ArrayList<>();
     private final int modConfigTab;
+    private final int wardrobeTab;
     private final int themeTab;
     private final int clientTab;
     private int tab;
@@ -72,6 +74,7 @@ public class ClickGuiScreen extends Screen {
     private final Map<Module, ModuleCard> cards = new IdentityHashMap<>();
     private final List<UIComponent> themeContent = new ArrayList<>();
     private List<ModConfigCard> modConfigCards;
+    private WardrobePanel wardrobe;
     private final List<UIComponent> clientContent = new ArrayList<>();
     private final List<UIComponent> visibleContent = new ArrayList<>();
     private final List<Animation> tabHover = new ArrayList<>();
@@ -108,6 +111,8 @@ public class ClickGuiScreen extends Screen {
         }
         modConfigTab = tabs.size();
         tabs.add(new Tab("Mod Configs", Icons.Icon.CONFIG, "Settings for every installed mod", null));
+        wardrobeTab = tabs.size();
+        tabs.add(new Tab("Wardrobe", Icons.Icon.WARDROBE, "Capes, trails and coins", null));
         themeTab = tabs.size();
         tabs.add(new Tab("Themes", Icons.Icon.THEMES, "Presets, colors, fonts and animation", null));
         clientTab = tabs.size();
@@ -295,6 +300,11 @@ public class ClickGuiScreen extends Screen {
             for (Module m : AnnoyingClient.modules().search(search.getText())) {
                 visibleContent.add(cards.get(m));
             }
+        } else if (tab == wardrobeTab) {
+            if (wardrobe == null) {
+                wardrobe = new WardrobePanel();
+            }
+            visibleContent.add(wardrobe);
         } else if (tab == themeTab) {
             visibleContent.addAll(themeContent);
         } else if (tab == clientTab) {
@@ -580,6 +590,11 @@ public class ClickGuiScreen extends Screen {
     /** Local Y of the sidebar tab at {@code index} (categories first, then Themes and Client). */
     public float getTabY(int index) {
         return tabYFor(index);
+    }
+
+    /** Scrolls the content area by {@code amount} (positive scrolls down), as the mouse wheel does. */
+    public void scrollContent(float amount) {
+        scrollTarget += amount;
     }
 
     public boolean isFullyOpen() {

@@ -10,7 +10,7 @@ import org.joml.Matrix3x2fStack;
 public final class Icons {
 
     public enum Icon {
-        RENDER, HUD, UTILITY, VISUAL, MISC, THEMES, CLIENT, SEARCH, CLOSE, CHECK, INFO, WARNING, PLAY, STOP, CONFIG, EDIT
+        RENDER, HUD, UTILITY, VISUAL, MISC, THEMES, CLIENT, SEARCH, CLOSE, CHECK, INFO, WARNING, PLAY, STOP, CONFIG, EDIT, WARDROBE, COIN
     }
 
     private Icons() {
@@ -104,6 +104,18 @@ public final class Icons {
                 for (int i = -1; i <= 1; i++) {
                     RenderUtil.roundedRect(g, cx - h, cy + i * h * 0.6f - t / 2f, s, t, t / 2f, color);
                 }
+            }
+            case WARDROBE -> {
+                // a clothes hanger
+                RenderUtil.roundedOutline(g, cx - s * 0.12f, cy - h, s * 0.24f, s * 0.24f, s * 0.12f, t * 0.9f, color);
+                rotatedRect(g, cx - h * 0.5f, cy + h * 0.1f, s * 0.62f, t, -32, color);
+                rotatedRect(g, cx + h * 0.5f, cy + h * 0.1f, s * 0.62f, t, 32, color);
+                RenderUtil.rect(g, cx - h, cy + h * 0.45f, s, t, color);
+            }
+            case COIN -> {
+                RenderUtil.circle(g, cx, cy, h, color);
+                RenderUtil.circle(g, cx, cy, h * 0.62f, 0x40000000);
+                RenderUtil.rect(g, cx - t / 2f, cy - h * 0.4f, t, h * 0.8f, 0x90FFFFFF);
             }
             case EDIT -> {
                 rotatedRect(g, cx + s * 0.05f, cy - s * 0.05f, s * 0.95f, t * 2f, -45, color);

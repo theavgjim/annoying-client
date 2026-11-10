@@ -1,6 +1,8 @@
 package com.annoyingclient;
 
 import com.annoyingclient.config.ConfigManager;
+import com.annoyingclient.cosmetics.CosmeticsManager;
+import com.annoyingclient.module.impl.visual.CosmeticsModule;
 import com.annoyingclient.event.ClientTickEvent;
 import com.annoyingclient.event.EventBus;
 import com.annoyingclient.gui.clickgui.ClickGuiScreen;
@@ -91,6 +93,7 @@ public final class AnnoyingClient implements ClientModInitializer {
     private KeybindManager keybinds;
     private ConfigManager config;
     private HudColorsModule hudColors;
+    private CosmeticsManager cosmetics;
 
     @Override
     public void onInitializeClient() {
@@ -119,6 +122,7 @@ public final class AnnoyingClient implements ClientModInitializer {
         modules = new ModuleManager();
         registerModules();
         hudColors = modules.get(HudColorsModule.class);
+        cosmetics = new CosmeticsManager();
 
         // 3. Systems that read the module list
         hud = new HudManager(modules, notifications, theme);
@@ -139,10 +143,12 @@ public final class AnnoyingClient implements ClientModInitializer {
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             events.post(ClientTickEvent.INSTANCE);
             config.tick();
+            cosmetics.tick();
         });
         ClientLifecycleEvents.CLIENT_STARTED.register(this::onClientStarted);
         ClientLifecycleEvents.CLIENT_STOPPING.register(client -> {
             config.shutdown();
+            cosmetics.shutdown();
             LOGGER.info("{} shut down, configuration saved", BRANDING);
         });
         registerScreenHooks();
@@ -178,6 +184,7 @@ public final class AnnoyingClient implements ClientModInitializer {
         modules.register(new ZoomModule());
         modules.register(new HudColorsModule());
         modules.register(new ScreenshotModule());
+        modules.register(new CosmeticsModule());
         // Miscellaneous
         modules.register(new BackgroundFpsModule());
     }
@@ -251,6 +258,10 @@ public final class AnnoyingClient implements ClientModInitializer {
 
     public static CpsTracker cps() {
         return instance.cps;
+    }
+
+    public static CosmeticsManager cosmetics() {
+        return instance == null ? null : instance.cosmetics;
     }
 
     public static HudColorsModule hudColors() {
