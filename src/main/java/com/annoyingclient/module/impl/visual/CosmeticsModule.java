@@ -9,7 +9,10 @@ import com.annoyingclient.setting.StringSetting;
 /** Capes and trails. Pick and buy them in the ClickGUI's Wardrobe tab. */
 public class CosmeticsModule extends Module {
 
-    private final StringSetting serverUrl = add(new StringSetting("Server URL", "Address of your Annoying Client cosmetics server", "", 200));
+    /** The official Annoying Client cosmetics server. */
+    public static final String DEFAULT_SERVER = "https://annoying-client.onrender.com";
+
+    private final StringSetting serverUrl = add(new StringSetting("Server URL", "Cosmetics server address. Empty = the official server, \"off\" = no server", "", 200));
     private final BooleanSetting showOthers = add(new BooleanSetting("Show Other Players", "Show other Annoying Client players' cosmetics", true));
     private final BooleanSetting showTrails = add(new BooleanSetting("Show Trails", "Draw particle trails", true));
     private final StringSetting previewCape = add(new StringSetting("Preview Cape", "", "", 40).hide());
@@ -24,7 +27,21 @@ public class CosmeticsModule extends Module {
         return false;
     }
 
+    /** The server to use: the setting, else ANNOYING_COSMETICS_URL (tests), else the official server; "off" disables it. */
     public String serverUrl() {
+        String v = serverUrl.getValue().trim();
+        if (v.equalsIgnoreCase("off")) {
+            return "";
+        }
+        if (!v.isEmpty()) {
+            return v;
+        }
+        String env = System.getenv("ANNOYING_COSMETICS_URL");
+        return env != null && !env.isBlank() ? env.trim() : DEFAULT_SERVER;
+    }
+
+    /** What the Wardrobe's address field shows. */
+    public String serverUrlSetting() {
         return serverUrl.getValue();
     }
 

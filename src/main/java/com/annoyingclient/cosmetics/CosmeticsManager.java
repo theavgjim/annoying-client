@@ -70,6 +70,7 @@ public final class CosmeticsManager {
     private String connectedUrl = "";
     private long nextLookup;
     private long nextAnnouncementCheck;
+    private long nextRetry;
     private int lastAnnouncement = -1;
     private int tickCounter;
 
@@ -154,6 +155,10 @@ public final class CosmeticsManager {
             }
         }
         long now = System.currentTimeMillis();
+        if (status == Status.ERROR && checkUrl(url) == null && nextRetry > 0 && now >= nextRetry) {
+            nextRetry = 0;
+            signIn(null);
+        }
         if (status != Status.NO_SERVER && status != Status.ERROR && mc.level != null && now >= nextLookup) {
             nextLookup = now + 30_000;
             lookupNearby();
@@ -241,7 +246,7 @@ public final class CosmeticsManager {
     // ---- server calls -------------------------------------------------------------------------
 
     private JsonElement request(String method, String path, Object body, boolean auth) throws Exception {
-        HttpRequest.Builder b = HttpRequest.newBuilder(URI.create(baseUrl() + path)).timeout(Duration.ofSeconds(12))
+        HttpRequest.Builder b = HttpRequest.newBuilder(URI.create(baseUrl() + path)).timeout(Duration.ofSeconds(70)) // the free host needs up to a minute to wake up
                 .header("Accept", "application/json").header("User-Agent", "AnnoyingClient/" + AnnoyingClient.getInstance().getVersion());
         if (auth && token != null) {
             b.header("Authorization", "Bearer " + token);
@@ -336,6 +341,7 @@ public final class CosmeticsManager {
             } else {
                 status = Status.ERROR;
                 error = err;
+                nextRetry = System.currentTimeMillis() + 120_000; // try again in 2 minutes
             }
             if (done != null) {
                 done.accept(err);

@@ -1,10 +1,10 @@
 {
-  "version": "1.2.0",
-  "notes": "The launcher now updates itself, and theavgjim_ shows as Owner in the Wardrobe.",
-  "published": "2026-11-10T14:27:37Z",
+  "version": "1.2.1",
+  "notes": "Cosmetics now work out of the box: the client connects to the official Annoying Client server.",
+  "published": "2026-11-10T15:09:39Z",
   "windows": {
     "url": "https://raw.githubusercontent.com/theavgjim/annoying-client/main/docs/download/AnnoyingClient.exe",
-    "sha256": "3c4294abbacaef6d622eab285b87efc0e99c68be78f279e88fe41a9ab627da52",
+    "sha256": "d7258ddc80b1b28d9d5cb1c851857fe963691704a9ed121f23d7cee4f715bd2e",
     "size": 8262656
   }
 }

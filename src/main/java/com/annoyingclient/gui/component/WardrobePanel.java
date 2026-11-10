@@ -83,7 +83,7 @@ public class WardrobePanel extends UIComponent {
         refreshPlayers = new Button("Show players", false, 16, () -> cos().adminPlayers(list -> players = list));
         CosmeticsModule m = module();
         if (m != null) {
-            urlField.setText(m.serverUrl());
+            urlField.setText(m.serverUrlSetting());
         }
     }
 

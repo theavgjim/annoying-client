@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.2.1 (Minecraft 1.21.11)
+
+- **Official cosmetics server:** the client connects to `https://annoying-client.onrender.com` by default,
+  so capes, coins and the Wardrobe work without setup. Type `off` as the Server URL to disable it.
+- Sign-in waits up to 70 seconds for the free server to wake up, and retries every 2 minutes after a failure.
+
 ## 1.2.0 (Minecraft 1.21.11)
 
 - **Launcher auto-update:** the launcher checks `docs/update.json` at startup and every 6 hours and shows
