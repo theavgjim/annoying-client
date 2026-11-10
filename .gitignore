@@ -10,3 +10,4 @@ run/
 bin/
 classes/
 release/
+installer/payload/*.jar

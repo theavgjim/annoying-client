@@ -16,6 +16,21 @@ Screenshots were taken automatically by the in-game test suite (software renderi
 
 ## Installation
 
+### Windows installer (easiest)
+1. Install the official Minecraft Launcher and start it once.
+2. Close the launcher, then run **`AnnoyingClient-Installer.exe`** and choose **[1] Install**.
+3. Open the launcher, pick the **Annoying Client** profile, and press **Play**.
+
+The installer is self-contained: Annoying Client, Fabric API and the Fabric Loader profile are embedded.
+It installs into an isolated game folder, `%APPDATA%\.minecraft\annoying-client`, so your normal
+`mods` folder is untouched, and it copies your `options.txt` and `servers.dat` there once. Running it
+again upgrades the client; **[2] Uninstall** removes the profile and the installed files but keeps your
+worlds and settings. Options: `-dir "<path to .minecraft>"`, `-install`, `-uninstall`, `-no-pause`.
+
+The installer is not code-signed, so Windows SmartScreen may show "Windows protected your PC".
+Click *More info > Run anyway*. Its source is in `installer/` and it is rebuilt with `installer/build.sh`.
+
+### Manual installation
 1. Install [Fabric Loader](https://fabricmc.net/use/installer/) **0.20.1 or newer** for **Minecraft 1.21.11**.
 2. Download [Fabric API](https://modrinth.com/mod/fabric-api) for 1.21.11 (0.141.6 or newer).
 3. Put `annoying-client-1.0.0+mc1.21.11.jar` **and** the Fabric API JAR into your `.minecraft/mods` folder.
