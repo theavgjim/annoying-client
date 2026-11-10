@@ -17,6 +17,10 @@ in as someone else, so admin rights can't be faked.
 
 New players get 100 coins and the Annoying Cape. Everyone can claim 50 coins every 20 hours.
 
+## One-click deploy
+[Deploy to Render](https://render.com/deploy?repo=https://github.com/theavgjim/annoying-client) uses `render.yaml`
+(free plan; data resets when the server restarts unless you add a disk mounted at `/data`).
+
 ## Run it
 ```bash
 go run .

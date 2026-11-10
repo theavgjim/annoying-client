@@ -1,0 +1,13 @@
+# One-click deploy of the cosmetics server:
+# https://render.com/deploy?repo=https://github.com/theavgjim/annoying-client
+services:
+  - type: web
+    name: annoying-cosmetics
+    runtime: docker
+    plan: free
+    dockerContext: ./server
+    dockerfilePath: ./server/Dockerfile
+    healthCheckPath: /v1/catalog
+    envVars:
+      - key: ADMINS
+        value: theavgjim_
