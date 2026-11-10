@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"crypto/sha1"
+	"crypto/sha256"
 	"crypto/sha512"
 	"encoding/hex"
 	"errors"
@@ -24,6 +25,7 @@ type DownloadJob struct {
 	Path   string
 	SHA1   string // hex; verified when set
 	SHA512 string // hex; verified when set (Modrinth)
+	SHA256 string // hex; verified when set (launcher updates)
 	Size   int64  // 0 when unknown
 	Exec   bool   // mark executable (Java runtime)
 }
@@ -47,7 +49,7 @@ func fileValid(j DownloadJob) bool {
 	if j.Size > 0 && st.Size() != j.Size {
 		return false
 	}
-	if j.SHA1 == "" && j.SHA512 == "" {
+	if j.SHA1 == "" && j.SHA512 == "" && j.SHA256 == "" {
 		return j.Size > 0 || st.Size() > 0
 	}
 	f, err := os.Open(j.Path)
@@ -57,9 +59,12 @@ func fileValid(j DownloadJob) bool {
 	defer f.Close()
 	var h hash.Hash
 	want := j.SHA1
-	if j.SHA1 != "" {
+	switch {
+	case j.SHA1 != "":
 		h = sha1.New()
-	} else {
+	case j.SHA256 != "":
+		h, want = sha256.New(), j.SHA256
+	default:
 		h, want = sha512.New(), j.SHA512
 	}
 	if _, err := io.Copy(h, f); err != nil {
@@ -101,8 +106,8 @@ func downloadOne(ctx context.Context, j DownloadJob, onBytes func(int64)) error 
 			if err != nil {
 				return err
 			}
-			var h1, h512 hash.Hash = sha1.New(), sha512.New()
-			w := io.MultiWriter(out, h1, h512)
+			var h1, h256, h512 hash.Hash = sha1.New(), sha256.New(), sha512.New()
+			w := io.MultiWriter(out, h1, h256, h512)
 			buf := make([]byte, 64*1024)
 			var written int64
 			for {
@@ -133,6 +138,11 @@ func downloadOne(ctx context.Context, j DownloadJob, onBytes func(int64)) error 
 				return fmt.Errorf("size mismatch for %s: got %d, want %d", j.URL, written, j.Size)
 			}
 			if j.SHA1 != "" && !strings.EqualFold(hex.EncodeToString(h1.Sum(nil)), j.SHA1) {
+				onBytes(-written)
+				os.Remove(tmp)
+				return fmt.Errorf("checksum mismatch for %s", j.URL)
+			}
+			if j.SHA256 != "" && !strings.EqualFold(hex.EncodeToString(h256.Sum(nil)), j.SHA256) {
 				onBytes(-written)
 				os.Remove(tmp)
 				return fmt.Errorf("checksum mismatch for %s", j.URL)

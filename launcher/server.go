@@ -37,6 +37,23 @@ type App struct {
 
 	profiles  *ProfileStore
 	profileMu sync.Mutex
+
+	updater *Updater
+	port    int
+}
+
+// updateLoop checks for a newer launcher at startup and every 6 hours.
+func (a *App) updateLoop() {
+	time.Sleep(3 * time.Second)
+	for {
+		if !a.settings.Get().DisableUpdateCheck {
+			if info, err := a.updater.Check(context.Background()); err == nil && info != nil {
+				logf("launcher update available: %s", info.Version)
+				a.events.Send("state", nil)
+			}
+		}
+		time.Sleep(6 * time.Hour)
+	}
 }
 
 // switchProfile points the game and mod manager at another profile's folder.
@@ -121,12 +138,39 @@ func (a *App) routes() http.Handler {
 	api("/api/performance", a.handlePerformance)
 	api("/api/performance/apply", a.handleApplyPerformance)
 	api("/api/open", a.handleOpen)
+	api("/api/update/check", func(r *http.Request) (any, error) {
+		info, err := a.updater.Check(r.Context())
+		a.events.Send("state", nil)
+		if err != nil {
+			return nil, err
+		}
+		return map[string]any{"update": info, "current": launcherVersion}, nil
+	})
+	api("/api/update/apply", func(r *http.Request) (any, error) {
+		if a.game.Busy() {
+			return nil, errors.New("close Minecraft and wait for downloads to finish before updating")
+		}
+		go func() {
+			err := a.updater.Apply(context.Background(), a.port, a.token, func(p Progress) {
+				a.events.Send("progress", map[string]any{"stage": p.Stage, "fraction": p.Fraction, "bytes": p.Bytes, "totalBytes": p.TotalBytes})
+			})
+			a.events.Send("progress", nil)
+			if err != nil {
+				a.events.notify("error", "Update failed", capitalize(err.Error()))
+				return
+			}
+			a.events.notify("success", "Updated", "Restarting the launcher...")
+		}()
+		return nil, nil
+	})
 	api("/api/profiles", func(r *http.Request) (any, error) {
 		list, active := a.profiles.List()
 		return map[string]any{"profiles": list, "active": active, "templates": templateSummaries()}, nil
 	})
 	api("/api/profiles/select", func(r *http.Request) (any, error) {
-		var in struct{ ID string `json:"id"` }
+		var in struct {
+			ID string `json:"id"`
+		}
 		if err := decode(r, &in); err != nil {
 			return nil, err
 		}
@@ -143,7 +187,9 @@ func (a *App) routes() http.Handler {
 		return nil, err
 	})
 	api("/api/profiles/delete", func(r *http.Request) (any, error) {
-		var in struct{ ID string `json:"id"` }
+		var in struct {
+			ID string `json:"id"`
+		}
 		if err := decode(r, &in); err != nil {
 			return nil, err
 		}
@@ -250,6 +296,8 @@ func (a *App) state() map[string]any {
 		"dataDir":          a.paths.Data,
 		"os":               runtime.GOOS,
 		"testAccount":      isTestBuild(),
+		"update":           a.updater.Available(),
+		"updateError":      a.updater.LastError(),
 		"profile":          a.profiles.ActiveProfile(),
 	}
 }

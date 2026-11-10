@@ -134,11 +134,11 @@ func (s *Server) admin(h authed) http.HandlerFunc {
 	})
 }
 
-func profileView(p *Player) map[string]any {
+func (s *Server) profileView(p *Player) map[string]any {
 	next := p.LastDaily.Add(dailyInterval)
 	return map[string]any{
 		"uuid": p.UUID, "name": p.Name, "coins": p.Coins, "owned": p.Owned, "equipped": p.Equipped,
-		"admin": p.Admin, "dailyReady": time.Now().After(next), "nextDaily": next,
+		"admin": p.Admin, "owner": s.admins[strings.ToLower(p.Name)], "dailyReady": time.Now().After(next), "nextDaily": next,
 	}
 }
 
@@ -197,7 +197,7 @@ func (s *Server) authFinish(w http.ResponseWriter, r *http.Request) {
 			db.audit(fmt.Sprintf("%s (%s) became admin from the ADMINS list", name, uuid))
 		}
 		db.Sessions[token] = &session{UUID: uuid, Expires: time.Now().Add(sessionLifetime)}
-		view = profileView(p)
+		view = s.profileView(p)
 		return nil
 	})
 	if err != nil {
@@ -232,7 +232,7 @@ func mojangVerify(username, serverID string) (string, string, error) {
 // ---- player endpoints ---------------------------------------------------------------------
 
 func (s *Server) me(w http.ResponseWriter, r *http.Request, p *Player, db *dbFile) (any, error) {
-	return profileView(p), nil
+	return s.profileView(p), nil
 }
 
 func (s *Server) daily(w http.ResponseWriter, r *http.Request, p *Player, db *dbFile) (any, error) {
@@ -241,7 +241,7 @@ func (s *Server) daily(w http.ResponseWriter, r *http.Request, p *Player, db *db
 	}
 	p.LastDaily = time.Now()
 	p.Coins += dailyCoins
-	return profileView(p), nil
+	return s.profileView(p), nil
 }
 
 func (s *Server) buy(w http.ResponseWriter, r *http.Request, p *Player, db *dbFile) (any, error) {
@@ -264,7 +264,7 @@ func (s *Server) buy(w http.ResponseWriter, r *http.Request, p *Player, db *dbFi
 	}
 	p.Coins -= c.Price
 	p.give(c.ID)
-	return profileView(p), nil
+	return s.profileView(p), nil
 }
 
 func (s *Server) equip(w http.ResponseWriter, r *http.Request, p *Player, db *dbFile) (any, error) {
@@ -280,7 +280,7 @@ func (s *Server) equip(w http.ResponseWriter, r *http.Request, p *Player, db *db
 	}
 	if in.ID == "" {
 		delete(p.Equipped, in.Type)
-		return profileView(p), nil
+		return s.profileView(p), nil
 	}
 	c := findCosmetic(in.ID)
 	if c == nil || c.Type != in.Type {
@@ -293,7 +293,7 @@ func (s *Server) equip(w http.ResponseWriter, r *http.Request, p *Player, db *db
 		p.Equipped = map[string]string{}
 	}
 	p.Equipped[in.Type] = c.ID
-	return profileView(p), nil
+	return s.profileView(p), nil
 }
 
 // lookup returns what other players are wearing (public; used to draw their cosmetics).
@@ -334,7 +334,7 @@ func target(db *dbFile, name string) (*Player, error) {
 func (s *Server) adminPlayers(w http.ResponseWriter, r *http.Request, admin *Player, db *dbFile) (any, error) {
 	list := make([]map[string]any, 0, len(db.Players))
 	for _, p := range db.Players {
-		list = append(list, map[string]any{"name": p.Name, "coins": p.Coins, "owned": len(p.Owned), "admin": p.Admin, "lastSeen": p.LastSeen})
+		list = append(list, map[string]any{"name": p.Name, "coins": p.Coins, "owned": len(p.Owned), "admin": p.Admin, "owner": s.admins[strings.ToLower(p.Name)], "lastSeen": p.LastSeen})
 	}
 	return list, nil
 }

@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.2.0 (Minecraft 1.21.11)
+
+- **Launcher auto-update:** the launcher checks `docs/update.json` at startup and every 6 hours and shows
+  "Update available" on the Play page. One click downloads the new exe, verifies its SHA-256, swaps it in
+  and restarts. A failed or tampered download leaves the current launcher untouched. Can be turned off in Settings.
+- **Owner label:** accounts in the server's `ADMINS` list show as "Owner" in the Wardrobe and the admin player list.
+- **release.sh:** one command sets the version, builds everything and publishes the update.
+
 ## 1.1.0 (Minecraft 1.21.11)
 
 - **Launcher profiles:** separate game folders per profile, with a "1.21.11 optimized" template of 50

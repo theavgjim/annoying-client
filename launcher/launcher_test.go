@@ -129,3 +129,18 @@ func TestModSafePath(t *testing.T) {
 		t.Error(err)
 	}
 }
+
+func TestVersionNewer(t *testing.T) {
+	cases := []struct {
+		a, b string
+		want bool
+	}{
+		{"1.2.0", "1.1.0", true}, {"1.10.0", "1.9.9", true}, {"1.1.0", "1.1.0", false},
+		{"1.0.9", "1.1.0", false}, {"v2.0", "1.9.9", true}, {"1.1.1", "1.1", true}, {"1.1.0-beta", "1.1.0", false},
+	}
+	for _, c := range cases {
+		if got := versionNewer(c.a, c.b); got != c.want {
+			t.Errorf("versionNewer(%q, %q) = %v, want %v", c.a, c.b, got, c.want)
+		}
+	}
+}

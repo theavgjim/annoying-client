@@ -110,6 +110,14 @@ function render() {
     hint.textContent = "Test build: launching with the test account.";
   }
 
+  const up = state.update;
+  $("#update-banner").classList.toggle("hidden", !up);
+  if (up) {
+    $("#update-title").textContent = "Annoying Client " + up.version + " is available";
+    $("#update-notes").textContent = (up.notes || "") + " You have " + state.version + ".";
+  }
+  $("#version-line").textContent = "You have " + state.version + (up ? ". Version " + up.version + " is available." : state.updateError ? ". " + state.updateError : ".");
+
   const play = $("#play-btn");
   play.classList.toggle("running", state.running);
   play.disabled = state.busy && !state.running;
@@ -146,6 +154,18 @@ $("#play-btn").addEventListener("click", async () => {
   }
   setProgress({ stage: "Starting", fraction: 0 });
   await guarded($("#play-btn"), () => api("/api/play", { mode }));
+});
+
+// ---- updates ------------------------------------------------------------------------------
+
+$("#update-now").onclick = () => guarded($("#update-now"), async () => {
+  setProgress({ stage: "Downloading the update", fraction: 0 });
+  await api("/api/update/apply", {});
+});
+$("#check-update").onclick = () => guarded($("#check-update"), async () => {
+  const res = await api("/api/update/check", {});
+  toast(res.update ? "info" : "success", res.update ? "Update available: " + res.update.version : "You have the latest version", res.current);
+  await refresh();
 });
 
 // ---- profiles -----------------------------------------------------------------------------
@@ -411,6 +431,7 @@ function fillSettings() {
   $("#set-jvm").value = s.extraJvmArgs;
   $("#set-threads").value = s.downloadThreads;
   $("#set-client").value = s.clientId;
+  $("#set-autoupdate").checked = !s.disableUpdateCheck;
   $("#data-dir").textContent = state.dataDir;
 }
 $("#save-settings").onclick = () => guarded($("#save-settings"), async () => {
@@ -420,6 +441,7 @@ $("#save-settings").onclick = () => guarded($("#save-settings"), async () => {
     fullscreen: $("#set-fullscreen").checked, keepOpen: $("#set-keepopen").checked,
     javaPath: $("#set-java").value.trim(), extraJvmArgs: $("#set-jvm").value.trim(),
     downloadThreads: +$("#set-threads").value, clientId: $("#set-client").value.trim(),
+    disableUpdateCheck: !$("#set-autoupdate").checked,
   };
   await api("/api/settings", s);
   mode = s.launchMode;
@@ -440,6 +462,7 @@ function connect() {
     const ev = JSON.parse(e.data);
     switch (ev.type) {
       case "progress": setProgress(ev.data); break;
+      case "restarting": $("#restart-modal").classList.remove("hidden"); break;
       case "state":
         refresh().then(() => { if (ev.data === null && state && !state.account) $("#login-modal").classList.add("hidden"); });
         if (state?.account) $("#login-modal").classList.add("hidden");
@@ -454,6 +477,12 @@ function connect() {
         if (logLines.length > 5000) logLines = logLines.slice(-4000);
         if ($("#page-console").classList.contains("active")) renderConsole();
         break;
+    }
+  };
+  es.onopen = () => {
+    if (!$("#restart-modal").classList.contains("hidden")) {
+      $("#restart-modal").classList.add("hidden");
+      refresh().then(() => toast("success", "Updated", "Now running " + (state ? state.version : "the new version")));
     }
   };
   es.onerror = () => { es.close(); setTimeout(connect, 1500); };

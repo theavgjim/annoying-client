@@ -236,6 +236,7 @@ public class AnnoyingClientGameTest implements FabricClientGameTest {
         String playerName = ctx.computeOnClient(mc -> mc.getUser().getName());
         boolean expectAdmin = playerName.equals("Player0");
         check(cos.profile().admin() == expectAdmin, playerName + " admin=" + cos.profile().admin() + ", expected " + expectAdmin);
+        check(cos.profile().owner() == expectAdmin, playerName + " owner=" + cos.profile().owner() + ", expected " + expectAdmin);
         int start = cos.profile().coins();
 
         // Daily reward through the button.

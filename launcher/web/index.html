@@ -30,6 +30,10 @@
   <main>
     <!-- PLAY -->
     <section class="page active" id="page-play">
+      <div class="update-banner hidden" id="update-banner">
+        <div><b id="update-title">Update available</b><span id="update-notes"></span></div>
+        <button class="btn primary" id="update-now">Update now</button>
+      </div>
       <div class="hero">
         <div class="hero-glow"></div>
         <div class="hero-content">
@@ -178,6 +182,13 @@
         <div class="row"><div></div><div class="inline"><button class="btn ghost" data-open="azure">Azure portal</button><button class="btn ghost" data-open="approval">Apply for approval</button></div></div>
       </div>
       <div class="card form">
+        <h3>Updates</h3>
+        <div class="row"><div><div class="label">Launcher version</div><div class="hint" id="version-line"></div></div>
+          <button class="btn" id="check-update">Check for updates</button></div>
+        <div class="row"><div><div class="label">Check for updates automatically</div><div class="hint">At startup and every 6 hours. Updates are only installed when you click Update now.</div></div>
+          <label class="switch"><input type="checkbox" id="set-autoupdate"><span></span></label></div>
+      </div>
+      <div class="card form">
         <h3>Maintenance</h3>
         <div class="row"><div><div class="label">Launcher data</div><div class="hint" id="data-dir"></div></div>
           <div class="inline"><button class="btn ghost" data-open="data">Open</button><button class="btn" id="repair">Repair game files</button></div></div>
@@ -217,6 +228,12 @@
     <h3>Delete profile?</h3>
     <p id="remove-text"></p>
     <div class="inline center"><button class="btn danger" id="remove-confirm">Delete</button><button class="btn ghost" id="remove-cancel">Cancel</button></div>
+  </div>
+</div>
+<div class="modal hidden" id="restart-modal">
+  <div class="modal-card">
+    <h3>Updating Annoying Client</h3>
+    <p>The launcher is restarting into the new version. This takes a few seconds.</p>
   </div>
 </div>
 <div class="toasts" id="toasts"></div>

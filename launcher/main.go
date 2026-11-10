@@ -24,7 +24,8 @@ import (
 	"time"
 )
 
-const launcherVersion = "1.1.0"
+// launcherVersion is set at build time for test builds (-ldflags "-X main.launcherVersion=...").
+var launcherVersion = "1.2.0"
 
 var logger = log.New(os.Stderr, "", log.LstdFlags)
 
@@ -34,8 +35,10 @@ func main() {
 	dataDir := flag.String("data", defaultDataDir(), "launcher data folder")
 	noWindow := flag.Bool("no-window", false, "do not open a window; print the URL instead")
 	port := flag.Int("port", 0, "port to listen on (0 = random)")
+	resume := flag.Bool("resume", false, "internal: take over from a launcher that just updated itself")
 	flag.Parse()
 
+	var err error
 	paths := newPaths(*dataDir)
 	if err := paths.ensure(); err != nil {
 		fatal("Cannot create the launcher folder %s: %v", paths.Data, err)
@@ -46,7 +49,7 @@ func main() {
 	logf("Annoying Client Launcher %s (%s/%s), data: %s", launcherVersion, runtime.GOOS, runtime.GOARCH, paths.Data)
 
 	lockPath := filepath.Join(paths.Data, "launcher.lock")
-	if url := existingInstance(lockPath); url != "" && !*noWindow {
+	if url := existingInstance(lockPath); url != "" && !*noWindow && !*resume {
 		logf("launcher already running; focusing %s", url)
 		openWindow(url, paths)
 		return
@@ -60,12 +63,21 @@ func main() {
 
 	tokenBytes := make([]byte, 24)
 	_, _ = rand.Read(tokenBytes)
+	token := hex.EncodeToString(tokenBytes)
+	if *resume {
+		// Keep the previous launcher's token, so its open window keeps working after the update.
+		if t := os.Getenv("ANNOYING_RESUME_TOKEN"); len(t) == 48 {
+			token = t
+		}
+		os.Unsetenv("ANNOYING_RESUME_TOKEN")
+		go cleanupOldExecutable()
+	}
 	events := newEventHub()
 	settings := loadSettings(filepath.Join(paths.Data, "launcher.json"))
 	mods := newModManager(paths.Mods)
 	app := &App{
 		paths: paths, settings: settings, auth: newAuthManager(filepath.Join(paths.Data, "account.dat")),
-		mods: mods, game: newGame(paths, settings, mods, events), events: events, token: hex.EncodeToString(tokenBytes),
+		mods: mods, game: newGame(paths, settings, mods, events), events: events, token: token, updater: newUpdater(),
 		profiles: profiles,
 	}
 
@@ -77,10 +89,19 @@ func main() {
 		events.Send("state", nil)
 	}()
 
-	ln, err := net.Listen("tcp", fmt.Sprintf("127.0.0.1:%d", *port))
+	var ln net.Listener
+	for attempt := 0; ; attempt++ {
+		ln, err = net.Listen("tcp", fmt.Sprintf("127.0.0.1:%d", *port))
+		// After an update the old launcher may need a moment to release its port.
+		if err == nil || !*resume || attempt >= 50 {
+			break
+		}
+		time.Sleep(200 * time.Millisecond)
+	}
 	if err != nil {
 		fatal("Cannot start the launcher: %v", err)
 	}
+	app.port = ln.Addr().(*net.TCPAddr).Port
 	url := fmt.Sprintf("http://%s/?t=%s", ln.Addr().String(), app.token)
 	_ = os.WriteFile(lockPath, []byte(url), 0o600)
 	defer os.Remove(lockPath)
@@ -107,14 +128,25 @@ func main() {
 		mu.Unlock()
 	}
 
-	if *noWindow {
+	if *noWindow || *resume {
 		fmt.Println(url)
 	} else {
 		openWindow(url, paths)
 	}
+	go app.updateLoop()
 
 	for {
-		time.Sleep(2 * time.Second)
+		select {
+		case <-app.updater.restart:
+			logf("restarting into the updated launcher")
+			app.events.Send("restarting", nil)
+			time.Sleep(300 * time.Millisecond)
+			ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+			_ = srv.Shutdown(ctx)
+			cancel()
+			return
+		case <-time.After(2 * time.Second):
+		}
 		mu.Lock()
 		idle := clients == 0 && time.Since(lastSeen) > 8*time.Second
 		waitedTooLong := !everConnected && time.Since(lastSeen) > 90*time.Second

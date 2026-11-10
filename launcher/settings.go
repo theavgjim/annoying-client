@@ -23,6 +23,8 @@ type Settings struct {
 	KeepOpen        bool   `json:"keepOpen"`
 	FPSPreset       string `json:"fpsPreset"` // last applied preset
 	DownloadThreads int    `json:"downloadThreads"`
+	// DisableUpdateCheck turns off the automatic launcher update check (on by default).
+	DisableUpdateCheck bool `json:"disableUpdateCheck"`
 }
 
 func defaultSettings() Settings {

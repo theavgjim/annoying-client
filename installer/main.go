@@ -28,20 +28,20 @@ import (
 
 const (
 	clientName       = "Annoying Client"
-	clientVersion    = "1.1.0"
+	clientVersion    = "1.2.0"
 	minecraftVersion = "1.21.11"
 	loaderVersion    = "0.20.1"
 	profileKey       = "annoying-client"
 	instanceDirName  = "annoying-client"
 	markerFile       = "annoying-client-install.json"
 
-	clientJarName    = "annoying-client-1.1.0+mc1.21.11.jar"
+	clientJarName    = "annoying-client-1.2.0+mc1.21.11.jar"
 	fabricApiJarName = "fabric-api-0.141.6+1.21.11.jar"
 )
 
 var versionID = "fabric-loader-" + loaderVersion + "-" + minecraftVersion
 
-//go:embed payload/annoying-client-1.1.0+mc1.21.11.jar
+//go:embed payload/annoying-client-1.2.0+mc1.21.11.jar
 var clientJar []byte
 
 //go:embed payload/fabric-api-0.141.6+1.21.11.jar

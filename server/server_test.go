@@ -121,6 +121,9 @@ func TestAdmin(t *testing.T) {
 	ts, _ := newTestServer(t)
 	alexTok, _ := login(t, ts, "Alex")
 	ownerTok, owner := login(t, ts, "theavgjim_")
+	if !owner["owner"].(bool) {
+		t.Fatal("theavgjim_ should be flagged as owner")
+	}
 	if !owner["admin"].(bool) {
 		t.Fatal("theavgjim_ should become admin from the ADMINS list")
 	}

@@ -85,6 +85,11 @@ h1 { font-size: 46px; margin: 6px 0 4px; letter-spacing: 1px; }
 .template.active { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent) inset; }
 .template b { display: block; margin-bottom: 4px; }
 .template span { color: var(--muted); font-size: 13px; }
+.update-banner { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 14px;
+  background: linear-gradient(90deg, color-mix(in srgb, var(--accent) 22%, var(--panel)), var(--panel)); border: 1px solid color-mix(in srgb, var(--accent) 55%, var(--line));
+  border-radius: var(--radius); padding: 14px 18px; }
+.update-banner b { display: block; }
+.update-banner span { color: var(--muted); font-size: 13px; }
 .progress { margin-top: 22px; max-width: 560px; }
 .progress-top { display: flex; justify-content: space-between; font-size: 13px; color: var(--muted); margin-bottom: 7px; }
 .bar { height: 8px; background: #ffffff10; border-radius: 8px; overflow: hidden; }

@@ -257,7 +257,7 @@ public class WardrobePanel extends UIComponent {
         Icons.draw(g, Icons.Icon.COIN, x + 18, y + STATUS_H / 2f, 14, 0xFFF5BE3C);
         if (p != null) {
             TextRenderer.drawScaled(g, p.coins() + " coins", x + 32, y + 8, 1.2f, t.text(), true);
-            TextRenderer.draw(g, "Signed in as " + p.name() + (p.admin() ? "  ·  Admin" : ""), x + 32, y + 24, t.textMuted());
+            TextRenderer.draw(g, "Signed in as " + p.name() + (p.owner() ? "  ·  Owner" : p.admin() ? "  ·  Admin" : ""), x + 32, y + 24, t.textMuted());
             if (p.dailyReady()) {
                 daily.setBounds(x + width - 76, y + 12, 68);
                 daily.render(g, mouseX, mouseY);

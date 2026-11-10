@@ -47,7 +47,7 @@ public final class CosmeticsManager {
     public enum Status { NO_SERVER, SIGNED_OUT, SIGNING_IN, SIGNED_IN, ERROR }
 
     /** The signed-in player's data as the server returned it. */
-    public record Profile(String name, int coins, Set<String> owned, Map<String, String> equipped, boolean admin, boolean dailyReady) {
+    public record Profile(String name, int coins, Set<String> owned, Map<String, String> equipped, boolean admin, boolean owner, boolean dailyReady) {
     }
 
     private static final Gson GSON = new Gson();
@@ -357,7 +357,7 @@ public final class CosmeticsManager {
             }
         }
         profile = new Profile(p.get("name").getAsString(), p.get("coins").getAsInt(), Set.copyOf(owned), Map.copyOf(equipped),
-                p.get("admin").getAsBoolean(), p.has("dailyReady") && p.get("dailyReady").getAsBoolean());
+                p.get("admin").getAsBoolean(), p.has("owner") && p.get("owner").getAsBoolean(), p.has("dailyReady") && p.get("dailyReady").getAsBoolean());
     }
 
     private void lookupNearby() {
@@ -463,7 +463,7 @@ public final class CosmeticsManager {
                 JsonArray arr = request("GET", "/v1/admin/players", null, true).getAsJsonArray();
                 for (JsonElement e : arr) {
                     JsonObject o = e.getAsJsonObject();
-                    names.add(o.get("name").getAsString() + "  ·  " + o.get("coins").getAsInt() + " coins" + (o.get("admin").getAsBoolean() ? "  ·  admin" : ""));
+                    names.add(o.get("name").getAsString() + "  ·  " + o.get("coins").getAsInt() + " coins" + (o.has("owner") && o.get("owner").getAsBoolean() ? "  ·  owner" : o.get("admin").getAsBoolean() ? "  ·  admin" : ""));
                 }
             } catch (Exception ignored) {
                 // shown as an empty list

@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-const userAgent = "AnnoyingClient-Launcher/" + launcherVersion
+var userAgent = "AnnoyingClient-Launcher/" + launcherVersion
 
 var httpClient = &http.Client{Timeout: 60 * time.Second}
 
