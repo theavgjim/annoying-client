@@ -1,10 +1,10 @@
 {
-  "version": "1.2.1",
-  "notes": "Cosmetics now work out of the box: the client connects to the official Annoying Client server.",
-  "published": "2026-11-10T15:09:39Z",
+  "version": "1.2.2",
+  "notes": "Thinner capes, and a new Wavy capes option in the Wardrobe.",
+  "published": "2026-11-10T16:37:18Z",
   "windows": {
     "url": "https://raw.githubusercontent.com/theavgjim/annoying-client/main/docs/download/AnnoyingClient.exe",
-    "sha256": "d7258ddc80b1b28d9d5cb1c851857fe963691704a9ed121f23d7cee4f715bd2e",
-    "size": 8262656
+    "sha256": "b14b0f11342038523798862e10a23f9b70fa36165f41bd85869bc6eb6e3a6afc",
+    "size": 8268800
   }
 }

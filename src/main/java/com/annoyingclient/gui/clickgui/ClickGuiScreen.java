@@ -75,6 +75,11 @@ public class ClickGuiScreen extends Screen {
     private final List<UIComponent> themeContent = new ArrayList<>();
     private List<ModConfigCard> modConfigCards;
     private WardrobePanel wardrobe;
+
+    /** The Wardrobe tab's panel once it has been opened, else null. */
+    public WardrobePanel wardrobe() {
+        return wardrobe;
+    }
     private final List<UIComponent> clientContent = new ArrayList<>();
     private final List<UIComponent> visibleContent = new ArrayList<>();
     private final List<Animation> tabHover = new ArrayList<>();

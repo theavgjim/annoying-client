@@ -306,6 +306,31 @@ public class AnnoyingClientGameTest implements FabricClientGameTest {
         ctx.runOnClient(mc -> mc.options.setCameraType(net.minecraft.client.CameraType.THIRD_PERSON_BACK));
         ctx.waitTicks(8);
         ctx.takeScreenshot("annoying-24-cape-third-person");
+
+        // Cape styles, seen from the side in the Wardrobe preview: vanilla, thin (the default) and thin + wavy.
+        var capes = AnnoyingClient.modules().get(com.annoyingclient.module.impl.visual.CosmeticsModule.class);
+        check(capes.thinCapes() && !capes.wavyCapes(), "Thin capes should be on and wavy capes off by default");
+        ctx.getInput().pressKey(GLFW.GLFW_KEY_RIGHT_SHIFT);
+        ctx.waitFor(mc -> mc.screen instanceof ClickGuiScreen s && s.isFullyOpen());
+        clickTab(ctx, 6);
+        ctx.waitFor(mc -> ((ClickGuiScreen) mc.screen).wardrobe() != null);
+        ctx.runOnClient(mc -> ((ClickGuiScreen) mc.screen).wardrobe().setPreviewYaw(90));
+        String[][] styles = {{"classic", "false", "false"}, {"thin", "true", "false"}, {"wavy", "true", "true"}};
+        for (String[] style : styles) {
+            ctx.runOnClient(mc -> {
+                capes.thinCapesSetting().setValue(Boolean.parseBoolean(style[1]));
+                capes.wavyCapesSetting().setValue(Boolean.parseBoolean(style[2]));
+            });
+            long before = com.annoyingclient.cosmetics.CapeRenderer.drawn;
+            ctx.waitTicks(3);
+            ctx.takeScreenshot("annoying-25-cape-" + style[0]);
+            long after = com.annoyingclient.cosmetics.CapeRenderer.drawn;
+            check(style[0].equals("classic") ? after == before : after > before,
+                    style[0] + " cape: custom renderer drew " + (after - before) + " times");
+        }
+        ctx.getInput().pressKey(GLFW.GLFW_KEY_ESCAPE);
+        ctx.waitFor(mc -> mc.screen == null);
+        ctx.runOnClient(mc -> capes.wavyCapesSetting().setValue(false));
         ctx.runOnClient(mc -> mc.options.setCameraType(net.minecraft.client.CameraType.FIRST_PERSON));
     }
 

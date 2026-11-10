@@ -61,6 +61,8 @@ public class WardrobePanel extends UIComponent {
     private final ModeSetting adminCosmetic;
     private final StringSetting adminMessage = new StringSetting("Announcement", "Shown to every signed-in player", "", 200);
     private final List<SettingComponent<?>> adminFields = new ArrayList<>();
+    /** "Thin capes" and "Wavy capes", under the preview. */
+    private final List<SettingComponent<?>> capeToggles = new ArrayList<>();
     private final List<Button> adminButtons = new ArrayList<>();
     private final Button sendAnnouncement;
     private final Button refreshPlayers;
@@ -84,7 +86,14 @@ public class WardrobePanel extends UIComponent {
         CosmeticsModule m = module();
         if (m != null) {
             urlField.setText(m.serverUrlSetting());
+            capeToggles.add(SettingComponent.create(m.thinCapesSetting(), "Thin capes"));
+            capeToggles.add(SettingComponent.create(m.wavyCapesSetting(), "Wavy capes"));
         }
+    }
+
+    /** Turns the player preview (used by the game test for side views). */
+    public void setPreviewYaw(float yaw) {
+        this.yaw = yaw;
     }
 
     private static CosmeticsManager cos() {
@@ -206,8 +215,16 @@ public class WardrobePanel extends UIComponent {
         return rows * CARD_H + (rows - 1) * GAP;
     }
 
+    private float previewColumnHeight() {
+        float h = 170;
+        for (SettingComponent<?> f : capeToggles) {
+            h += 4 + f.getHeight();
+        }
+        return h;
+    }
+
     private float adminTop() {
-        return gridTop() + Math.max(gridHeight(), 170) + 16;
+        return gridTop() + Math.max(gridHeight(), previewColumnHeight()) + 16;
     }
 
     private float adminHeight() {
@@ -282,6 +299,17 @@ public class WardrobePanel extends UIComponent {
     }
 
     private void renderPreview(GuiGraphics g, float mouseX, float mouseY) {
+        float ty = gridTop() + 170;
+        for (SettingComponent<?> f : capeToggles) {
+            ty += 4;
+            f.setBounds(x, ty, PREVIEW_W);
+            f.render(g, mouseX, mouseY);
+            ty += f.getHeight();
+        }
+        renderPlayer(g, mouseX, mouseY);
+    }
+
+    private void renderPlayer(GuiGraphics g, float mouseX, float mouseY) {
         var t = theme();
         float px = x, py = gridTop(), pw = PREVIEW_W, ph = 170;
         RenderUtil.roundedRect(g, px, py, pw, ph, 6, t.surface());
@@ -457,6 +485,11 @@ public class WardrobePanel extends UIComponent {
             dragStartX = mouseX;
             yawStart = yaw;
             return true;
+        }
+        for (SettingComponent<?> f : capeToggles) {
+            if (f.mouseClicked(mouseX, mouseY, button)) {
+                return true;
+            }
         }
         // cosmetics grid
         List<Cosmetic> list = c.catalog();

@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.2.2 (Minecraft 1.21.11)
+
+- **Thin capes** (on by default): every cape is drawn about a third as thick as vanilla.
+- **Wavy capes** (off by default): capes ripple, more while you walk or run.
+- Both are toggles under the player preview in the Wardrobe, and in Visual > Cosmetics.
+
 ## 1.2.1 (Minecraft 1.21.11)
 
 - **Official cosmetics server:** the client connects to `https://annoying-client.onrender.com` by default,
