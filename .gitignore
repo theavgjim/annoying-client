@@ -11,3 +11,4 @@ bin/
 classes/
 release/
 installer/payload/*.jar
+launcher/embedded/*.jar
