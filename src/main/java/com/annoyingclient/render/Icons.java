@@ -10,7 +10,7 @@ import org.joml.Matrix3x2fStack;
 public final class Icons {
 
     public enum Icon {
-        RENDER, HUD, UTILITY, VISUAL, MISC, THEMES, CLIENT, SEARCH, CLOSE, CHECK, INFO, WARNING, PLAY, STOP, CONFIG, EDIT, WARDROBE, COIN
+        RENDER, HUD, UTILITY, VISUAL, MISC, THEMES, CLIENT, SEARCH, CLOSE, CHECK, INFO, WARNING, PLAY, STOP, CONFIG, EDIT, WARDROBE, COIN, STAR, STAR_FILLED, LINK, FOLDER
     }
 
     private Icons() {
@@ -117,11 +117,52 @@ public final class Icons {
                 RenderUtil.circle(g, cx, cy, h * 0.62f, 0x40000000);
                 RenderUtil.rect(g, cx - t / 2f, cy - h * 0.4f, t, h * 0.8f, 0x90FFFFFF);
             }
+            case STAR, STAR_FILLED -> {
+                // Five-pointed star: outline, plus spokes from the center when filled.
+                float outer = h, inner = h * 0.42f;
+                float[] px = new float[10], py = new float[10];
+                for (int k = 0; k < 10; k++) {
+                    double ang = Math.toRadians(-90 + k * 36);
+                    float r = k % 2 == 0 ? outer : inner;
+                    px[k] = cx + (float) Math.cos(ang) * r;
+                    py[k] = cy + 0.06f * s + (float) Math.sin(ang) * r;
+                }
+                if (icon == Icon.STAR_FILLED) {
+                    for (int k = 0; k < 40; k++) {
+                        int a = k / 4 % 10, b = (a + 1) % 10;
+                        float f = (k % 4) / 4f;
+                        line(g, cx, cy + 0.06f * s, px[a] + (px[b] - px[a]) * f, py[a] + (py[b] - py[a]) * f, t * 1.4f, color);
+                    }
+                }
+                for (int k = 0; k < 10; k++) {
+                    line(g, px[k], py[k], px[(k + 1) % 10], py[(k + 1) % 10], t * 0.9f, color);
+                }
+            }
+            case LINK -> {
+                // Arrow out of a box: "opens in your browser".
+                RenderUtil.roundedOutline(g, cx - h, cy - h * 0.7f, s * 0.8f, s * 0.8f, s * 0.12f, t, color);
+                line(g, cx - h * 0.1f, cy + h * 0.1f, cx + h, cy - h, t, color);
+                line(g, cx + h * 0.25f, cy - h, cx + h, cy - h, t, color);
+                line(g, cx + h, cy - h, cx + h, cy - h * 0.25f, t, color);
+            }
+            case FOLDER -> {
+                RenderUtil.roundedOutline(g, cx - h, cy - h * 0.55f, s, s * 0.8f, s * 0.1f, t, color);
+                RenderUtil.roundedRect(g, cx - h, cy - h * 0.8f, s * 0.42f, s * 0.2f, s * 0.08f, color);
+            }
             case EDIT -> {
                 rotatedRect(g, cx + s * 0.05f, cy - s * 0.05f, s * 0.95f, t * 2f, -45, color);
                 RenderUtil.circle(g, cx - h * 0.72f, cy + h * 0.72f, t * 0.9f, color);
             }
         }
+    }
+
+    /** A straight stroke from (x1, y1) to (x2, y2). */
+    private static void line(GuiGraphics g, float x1, float y1, float x2, float y2, float thickness, int color) {
+        float len = (float) Math.hypot(x2 - x1, y2 - y1);
+        if (len < 0.01f) {
+            return;
+        }
+        rotatedRect(g, (x1 + x2) / 2f, (y1 + y2) / 2f, len + thickness * 0.5f, thickness, (float) Math.toDegrees(Math.atan2(y2 - y1, x2 - x1)), color);
     }
 
     private static void rotatedRect(GuiGraphics g, float cx, float cy, float length, float thickness, float degrees, int color) {

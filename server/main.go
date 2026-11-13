@@ -9,19 +9,36 @@
 //	PORT    listen port (default 8080)
 //	DATA    database file (default ./data/cosmetics.json)
 //	ADMINS  comma-separated Minecraft usernames that are owners (e.g. "theavgjim_")
+//	GITHUB_TOKEN  GitHub token with only the "gist" scope: backs the database up to a secret gist, so it
+//	        survives hosts that wipe the disk on restart (Render's free plan)
+//	GIST_ID optional; the gist to use (found automatically by its description otherwise)
 package main
 
 import (
+	"context"
+	"errors"
 	"log"
 	"net/http"
 	"os"
+	"os/signal"
 	"strings"
+	"syscall"
 	"time"
 )
 
 func main() {
 	port := envOr("PORT", "8080")
-	store, err := openStore(envOr("DATA", "data/cosmetics.json"))
+	var backup Backup
+	if token := os.Getenv("GITHUB_TOKEN"); token != "" {
+		gb := newGistBackup(token, os.Getenv("GIST_ID"))
+		if api := os.Getenv("GITHUB_API_URL"); api != "" { // tests and GitHub Enterprise
+			gb.api = strings.TrimRight(api, "/")
+		}
+		backup = gb
+	} else {
+		log.Printf("WARNING: GITHUB_TOKEN is not set; on hosts without a permanent disk, coins and cosmetics reset when the server restarts")
+	}
+	store, err := openStoreWithBackup(envOr("DATA", "data/cosmetics.json"), backup)
 	if err != nil {
 		log.Fatalf("cannot open database: %v", err)
 	}
@@ -41,7 +58,23 @@ func main() {
 	}
 	srv := &http.Server{Addr: ":" + port, Handler: s.routes(), ReadHeaderTimeout: 10 * time.Second, ReadTimeout: 20 * time.Second, WriteTimeout: 20 * time.Second}
 	log.Printf("Annoying Client cosmetics server on :%s (owners: %s)", port, strings.Join(keys(admins), ", "))
-	log.Fatal(srv.ListenAndServe())
+	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
+	defer stop()
+	go store.RunBackups(ctx)
+	go func() {
+		if err := srv.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
+			log.Fatal(err)
+		}
+	}()
+	<-ctx.Done()
+	// Hosts stop sleeping servers with SIGTERM: finish requests, then upload the last changes.
+	log.Printf("shutting down")
+	shutdown, cancel := context.WithTimeout(context.Background(), 20*time.Second)
+	defer cancel()
+	_ = srv.Shutdown(shutdown)
+	if err := store.Flush(shutdown); err != nil {
+		log.Printf("final backup failed: %v", err)
+	}
 }
 
 func envOr(k, def string) string {

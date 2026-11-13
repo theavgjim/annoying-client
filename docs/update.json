@@ -1,10 +1,10 @@
 {
-  "version": "1.2.2",
-  "notes": "Thinner capes, and a new Wavy capes option in the Wardrobe.",
-  "published": "2026-11-10T16:37:18Z",
+  "version": "1.3.0",
+  "notes": "Mod Configs apply without restarting, favorites and filters, a Saturation module, a Potion Effects HUD, and coins and cosmetics are kept.",
+  "published": "2026-11-13T21:21:37Z",
   "windows": {
     "url": "https://raw.githubusercontent.com/theavgjim/annoying-client/main/docs/download/AnnoyingClient.exe",
-    "sha256": "b14b0f11342038523798862e10a23f9b70fa36165f41bd85869bc6eb6e3a6afc",
-    "size": 8268800
+    "sha256": "4fdfbf61234fecf9deb52e8930c4c261614b9e13f239914b0cdd5f39158601b4",
+    "size": 8300544
   }
 }

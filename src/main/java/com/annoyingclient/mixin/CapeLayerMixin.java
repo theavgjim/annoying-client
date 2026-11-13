@@ -16,7 +16,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 
-/** Cosmetics: thin and wavy capes (see {@link CapeRenderer}). */
+/** Cosmetics: thin capes (see {@link CapeRenderer}). */
 @Mixin(CapeLayer.class)
 public abstract class CapeLayerMixin {
 

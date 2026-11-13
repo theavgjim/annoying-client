@@ -35,6 +35,7 @@ fabricApi {
     }
 }
 
+
 dependencies {
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
     // Official Mojang names: the same names Minecraft 26.x ships with, which keeps a later port small.
@@ -46,6 +47,22 @@ dependencies {
     // Development runs only (never shipped or required): a real mod with a config screen and a
     // config file, so the Mod Configs tab can be tested against it.
     modLocalRuntime "maven.modrinth:modmenu:17.0.1"
+    // Two common config libraries, so the game test can prove saved files apply without a restart.
+    modGametestImplementation "maven.modrinth:cloth-config:21.11.153+fabric"
+    modGametestImplementation "maven.modrinth:yacl:3.8.2+1.21.11-fabric"
+    // YACL ships its own libraries nested inside its jar; development runs need them unpacked.
+    gametestRuntimeOnly files({ fileTree(layout.buildDirectory.dir('yacl-libs')) { include '*.jar' }.files }) { builtBy 'unpackYaclLibraries' }
+}
+
+tasks.register('unpackYaclLibraries', Copy) {
+    def yacl = configurations.detachedConfiguration(dependencies.create("maven.modrinth:yacl:3.8.2+1.21.11-fabric"))
+    yacl.transitive = false
+    from({ yacl.collect { zipTree(it) } }) {
+        include 'META-INF/jars/*.jar'
+        eachFile { it.path = it.name }
+    }
+    into layout.buildDirectory.dir('yacl-libs')
+    includeEmptyDirs = false
 }
 
 processResources {
@@ -83,6 +100,7 @@ configurations {
     }
 }
 
+
 dependencies {
     productionMods "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
 }
@@ -114,6 +132,7 @@ configurations {
         transitive = false
     }
 }
+
 
 dependencies {
     // The client gametest module is not part of the Fabric API release JAR.

@@ -14,7 +14,8 @@
     "MinecraftClientMixin",
     "MouseHandlerMixin",
     "ScreenEffectRendererMixin",
-    "ScreenshotMixin"
+    "ScreenshotMixin",
+    "YaclConfigHandlerMixin"
   ],
   "injectors": {
     "defaultRequire": 1

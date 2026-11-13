@@ -11,3 +11,6 @@ services:
     envVars:
       - key: ADMINS
         value: theavgjim_
+      # GitHub token with only the "gist" scope, so coins and cosmetics survive the free plan's restarts.
+      - key: GITHUB_TOKEN
+        sync: false

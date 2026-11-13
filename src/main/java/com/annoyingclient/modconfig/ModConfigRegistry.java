@@ -14,6 +14,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -31,6 +32,8 @@ import java.util.stream.Stream;
 public final class ModConfigRegistry {
 
     private static final Set<String> HIDDEN = Set.of("minecraft", "java", "fabricloader", "mixinextras");
+    /** Mods whose settings are pages of the (Sodium-replaced) Video Settings screen. */
+    private static final Set<String> VIDEO_SETTINGS = Set.of("sodium", "sodium-extra", "reeses-sodium-options");
     private static final Set<String> CONFIG_EXT = Set.of("json", "json5", "properties", "toml", "cfg", "txt");
 
     private static List<ModEntry> cache;
@@ -107,7 +110,10 @@ public final class ModConfigRegistry {
     public static Screen createScreen(ModEntry entry, Screen parent) {
         Object factory = entry.screenFactory();
         if (factory == null) {
-            return null;
+            return entry.videoSettings()
+                    ? new net.minecraft.client.gui.screens.options.VideoSettingsScreen(parent, net.minecraft.client.Minecraft.getInstance(),
+                    net.minecraft.client.Minecraft.getInstance().options)
+                    : null;
         }
         try {
             for (Class<?> i : allInterfaces(factory.getClass())) {
@@ -150,16 +156,50 @@ public final class ModConfigRegistry {
                 continue; // Fabric API modules are listed once, as Fabric API
             }
             String authors = meta.getAuthors().stream().map(Person::getName).limit(3).collect(Collectors.joining(", "));
+            Map<String, String> links = new LinkedHashMap<>();
+            meta.getContact().get("homepage").filter(ModConfigRegistry::isWebLink).ifPresent(u -> links.put("Website", u));
+            meta.getContact().get("issues").filter(ModConfigRegistry::isWebLink).ifPresent(u -> links.put("Issues", u));
+            meta.getContact().get("sources").filter(ModConfigRegistry::isWebLink).ifPresent(u -> links.put("Source", u));
             out.add(new ModEntry(id, meta.getName(), meta.getVersion().getFriendlyString(), meta.getDescription(), authors,
                     mod, factories.get(id),
                     // Annoying Client's own settings are the ClickGUI itself, so its files are not offered here.
-                    id.equals(AnnoyingClient.MOD_ID) ? List.of() : matchConfigs(id, meta.getName(), configDir, allConfigs)));
+                    id.equals(AnnoyingClient.MOD_ID) ? List.of() : matchConfigs(id, meta.getName(), configDir, allConfigs),
+                    String.join(", ", meta.getLicense()), java.util.Collections.unmodifiableMap(links),
+                    isLibrary(meta), VIDEO_SETTINGS.contains(id) && factories.get(id) == null));
         }
         out.sort((a, b) -> {
-            int rank = Boolean.compare(b.hasScreen() || !b.configFiles().isEmpty(), a.hasScreen() || !a.configFiles().isEmpty());
+            int rank = Boolean.compare(b.hasSettings(), a.hasSettings());
             return rank != 0 ? rank : a.name().compareToIgnoreCase(b.name());
         });
         return out;
+    }
+
+    private static boolean isWebLink(String url) {
+        return url.startsWith("https://") || url.startsWith("http://");
+    }
+
+    /** Mod Menu's convention: {"custom": {"modmenu": {"badges": ["library"]}}}, plus well-known language adapters. */
+    private static boolean isLibrary(ModMetadata meta) {
+        String id = meta.getId();
+        if (id.startsWith("fabric-language-") || id.equals("fabric-api")) {
+            return true;
+        }
+        try {
+            var modmenu = meta.getCustomValue("modmenu");
+            if (modmenu != null && modmenu.getType() == net.fabricmc.loader.api.metadata.CustomValue.CvType.OBJECT) {
+                var badges = modmenu.getAsObject().get("badges");
+                if (badges != null && badges.getType() == net.fabricmc.loader.api.metadata.CustomValue.CvType.ARRAY) {
+                    for (var b : badges.getAsArray()) {
+                        if (b.getType() == net.fabricmc.loader.api.metadata.CustomValue.CvType.STRING && b.getAsString().equals("library")) {
+                            return true;
+                        }
+                    }
+                }
+            }
+        } catch (RuntimeException ignored) {
+            // malformed custom values: not a library
+        }
+        return false;
     }
 
     private static List<Path> listConfigs(Path dir) {

@@ -74,6 +74,10 @@ public class ClickGuiScreen extends Screen {
     private final Map<Module, ModuleCard> cards = new IdentityHashMap<>();
     private final List<UIComponent> themeContent = new ArrayList<>();
     private List<ModConfigCard> modConfigCards;
+    private com.annoyingclient.gui.component.ModConfigToolbar modConfigToolbar;
+    private int modConfigShown;
+    /** Set by components that change the list while it is being iterated (clicks); applied next frame. */
+    private boolean recollect;
     private WardrobePanel wardrobe;
 
     /** The Wardrobe tab's panel once it has been opened, else null. */
@@ -284,23 +288,78 @@ public class ClickGuiScreen extends Screen {
         if (modConfigCards == null) {
             modConfigCards = new ArrayList<>();
             for (ModEntry m : ModConfigRegistry.mods()) {
-                modConfigCards.add(new ModConfigCard(m));
+                modConfigCards.add(new ModConfigCard(m, this::requestRecollect));
             }
         }
         return modConfigCards;
+    }
+
+    /** The Mod Configs list: toolbar, then favorites first, filtered by the toolbar and the search box. */
+    private void collectModConfigs() {
+        if (modConfigToolbar == null) {
+            modConfigToolbar = new com.annoyingclient.gui.component.ModConfigToolbar(this::requestRecollect);
+        }
+        visibleContent.add(modConfigToolbar);
+        var prefs = com.annoyingclient.modconfig.ModConfigPrefs.get();
+        String q = search.getText().trim();
+        List<ModConfigCard> shown = new ArrayList<>();
+        int total = 0;
+        for (ModConfigCard c : modConfigCards()) {
+            ModEntry m = c.getMod();
+            if (m.library() && !prefs.showLibraries() && !c.isFavorite()) {
+                continue;
+            }
+            total++;
+            boolean pass = switch (prefs.filter()) {
+                case ALL -> true;
+                case SETTINGS -> m.hasSettings();
+                case FAVORITES -> c.isFavorite();
+            };
+            if (pass && (q.isEmpty() || c.matches(q))) {
+                shown.add(c);
+            }
+        }
+        // Stable sort keeps the registry order (with settings first, then by name) inside each group.
+        shown.sort((a, b) -> Boolean.compare(b.isFavorite(), a.isFavorite()));
+        modConfigToolbar.setSummary(total + " mods");
+        visibleContent.addAll(shown);
+        modConfigShown = shown.size();
+    }
+
+    private void requestRecollect() {
+        recollect = true;
+    }
+
+    /** The Mod Configs card for a mod if it is currently listed, else null (used by the game test). */
+    public ModConfigCard visibleModConfigCard(String modId) {
+        for (UIComponent c : visibleContent) {
+            if (c instanceof ModConfigCard card && card.getMod().id().equals(modId)) {
+                return card;
+            }
+        }
+        return null;
+    }
+
+    /** Visible Mod Configs cards, top to bottom (used by the game test). */
+    public List<String> visibleModConfigIds() {
+        List<String> out = new ArrayList<>();
+        for (UIComponent c : visibleContent) {
+            if (c instanceof ModConfigCard card) {
+                out.add(card.getMod().id());
+            }
+        }
+        return out;
+    }
+
+    public com.annoyingclient.gui.component.ModConfigToolbar modConfigToolbar() {
+        return modConfigToolbar;
     }
 
     private void collectContent() {
         visibleContent.clear();
         search.setPlaceholder(tab == modConfigTab ? "Search mods..." : "Search modules...");
         if (tab == modConfigTab) {
-            String q = search.getText().trim().toLowerCase(java.util.Locale.ROOT);
-            for (ModConfigCard c : modConfigCards()) {
-                if (q.isEmpty() || c.getMod().name().toLowerCase(java.util.Locale.ROOT).contains(q)
-                        || c.getMod().id().toLowerCase(java.util.Locale.ROOT).contains(q)) {
-                    visibleContent.add(c);
-                }
-            }
+            collectModConfigs();
         } else if (searching()) {
             for (Module m : AnnoyingClient.modules().search(search.getText())) {
                 visibleContent.add(cards.get(m));
@@ -339,6 +398,10 @@ public class ClickGuiScreen extends Screen {
 
     @Override
     public void render(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
+        if (recollect) {
+            recollect = false;
+            collectContent();
+        }
         String currentSearch = search.getText();
         if (!currentSearch.equals(lastSearch)) {
             lastSearch = currentSearch;
@@ -475,7 +538,7 @@ public class ClickGuiScreen extends Screen {
         String subtitle;
         if (searching() && tab == modConfigTab) {
             title = "Mod Configs";
-            subtitle = visibleContent.size() + " of " + modConfigCards().size() + " mods match \"" + search.getText().trim() + "\"";
+            subtitle = modConfigShown + (modConfigShown == 1 ? " mod matches" : " mods match") + " \"" + search.getText().trim() + "\"";
         } else if (searching()) {
             title = "Search";
             int results = AnnoyingClient.modules().search(search.getText()).size();
@@ -541,8 +604,12 @@ public class ClickGuiScreen extends Screen {
             }
             y += h + CONTENT_GAP;
         }
-        if (visibleContent.isEmpty()) {
-            String empty = tab == modConfigTab ? "No mods match your search" : searching() ? "No modules found" : "Nothing here yet";
+        boolean noMods = tab == modConfigTab && modConfigShown == 0;
+        if (visibleContent.isEmpty() || noMods) {
+            String empty = !noMods ? searching() ? "No modules found" : "Nothing here yet"
+                    : searching() ? "No mods match your search"
+                    : com.annoyingclient.modconfig.ModConfigPrefs.get().filter() == com.annoyingclient.modconfig.ModConfigPrefs.Filter.FAVORITES
+                    ? "No favorites yet: click the star on a mod" : "No mods to show";
             TextRenderer.draw(g, empty, cx + cw / 2f - TextRenderer.width(empty) / 2f, cy + 30, t.textMuted());
         }
         RenderUtil.endScissor(g);

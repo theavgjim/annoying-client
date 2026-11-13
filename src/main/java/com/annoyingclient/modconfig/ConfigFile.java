@@ -219,13 +219,27 @@ public final class ConfigFile {
             out = String.join("\n", copy);
             lines = copy;
         }
-        Path backup = path.resolveSibling(path.getFileName() + ".bak");
+        Path backup = backupOf(path);
         if (!Files.exists(backup)) {
             Files.copy(path, backup);
         }
         Path tmp = path.resolveSibling(path.getFileName() + ".tmp");
         Files.writeString(tmp, out, StandardCharsets.UTF_8);
         Files.move(tmp, path, StandardCopyOption.REPLACE_EXISTING);
+    }
+
+    /** The copy of the file taken before the first save from the Mod Configs tab. */
+    public static Path backupOf(Path path) {
+        return path.resolveSibling(path.getFileName() + ".bak");
+    }
+
+    /** Puts the original file back and removes the backup. */
+    public static void restoreBackup(Path path) throws IOException {
+        Path backup = backupOf(path);
+        if (!Files.exists(backup)) {
+            throw new IOException("There is no backup of " + path.getFileName());
+        }
+        Files.move(backup, path, StandardCopyOption.REPLACE_EXISTING);
     }
 
     private static Number toNumber(String s) {

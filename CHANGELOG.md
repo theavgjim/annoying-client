@@ -1,10 +1,28 @@
 # Changelog
 
+## 1.3.0 (Minecraft 1.21.11)
+
+- **Mod Configs: changes apply without restarting.** Saving a config file reloads it into the running mod for
+  mods built on Cloth Config or YetAnotherConfigLib, and for Sodium and Iris. Every file shows how it applies:
+  "Applies instantly", "Needs a restart" (mixin switches such as Lithium's, which no mod can change while
+  running) or "Applies on restart" (then the mod's Settings button changes it instantly).
+- **Mod Configs: more features.** Favorites (star a mod to pin it to the top), filters (All, With settings,
+  Favorites), libraries hidden unless switched on, search by name, author or description, a details panel with
+  the description, license and Website / Issues / Source links, "Open folder", and Undo to put a file back
+  as it was. Sodium, Sodium Extra and Reese's Sodium Options get a Settings button (Video Settings).
+- **Coins and cosmetics are kept.** The cosmetics server can back its database up to a secret GitHub gist
+  (`GITHUB_TOKEN`), so the free host's restarts no longer reset it. The client signs back in by itself
+  after a server restart.
+- **Saturation** (Visual): gold outlines on the hunger bar show your saturation, flashing drumsticks show what
+  the food in your hand restores, and "Show Numbers" writes the exact values above the bar.
+- **Potion Effects HUD**: your active effects with icons, level and time left (red when harmful, blinking for
+  the last 10 seconds). Sort by time, name or good-first; hides the vanilla corner icons while it's on.
+- Removed the wavy capes option. Thin capes stay.
+
 ## 1.2.2 (Minecraft 1.21.11)
 
 - **Thin capes** (on by default): every cape is drawn about a third as thick as vanilla.
-- **Wavy capes** (off by default): capes ripple, more while you walk or run.
-- Both are toggles under the player preview in the Wardrobe, and in Visual > Cosmetics.
+- A toggle under the player preview in the Wardrobe, and in Visual > Cosmetics.
 
 ## 1.2.1 (Minecraft 1.21.11)
 

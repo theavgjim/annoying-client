@@ -61,7 +61,7 @@ public class WardrobePanel extends UIComponent {
     private final ModeSetting adminCosmetic;
     private final StringSetting adminMessage = new StringSetting("Announcement", "Shown to every signed-in player", "", 200);
     private final List<SettingComponent<?>> adminFields = new ArrayList<>();
-    /** "Thin capes" and "Wavy capes", under the preview. */
+    /** "Thin capes", under the preview. */
     private final List<SettingComponent<?>> capeToggles = new ArrayList<>();
     private final List<Button> adminButtons = new ArrayList<>();
     private final Button sendAnnouncement;
@@ -87,7 +87,6 @@ public class WardrobePanel extends UIComponent {
         if (m != null) {
             urlField.setText(m.serverUrlSetting());
             capeToggles.add(SettingComponent.create(m.thinCapesSetting(), "Thin capes"));
-            capeToggles.add(SettingComponent.create(m.wavyCapesSetting(), "Wavy capes"));
         }
     }
 

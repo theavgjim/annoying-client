@@ -71,6 +71,7 @@ public final class CosmeticsManager {
     private long nextLookup;
     private long nextAnnouncementCheck;
     private long nextRetry;
+    private int failedSignIns;
     private int lastAnnouncement = -1;
     private int tickCounter;
 
@@ -155,6 +156,11 @@ public final class CosmeticsManager {
             }
         }
         long now = System.currentTimeMillis();
+        // The server restarted and forgot our login (sessions are never backed up): sign in again quietly.
+        if (status == Status.SIGNED_OUT && token == null && checkUrl(url) == null && now >= nextRetry) {
+            nextRetry = now + 5_000;
+            signIn(null);
+        }
         if (status == Status.ERROR && checkUrl(url) == null && nextRetry > 0 && now >= nextRetry) {
             nextRetry = 0;
             signIn(null);
@@ -281,7 +287,7 @@ public final class CosmeticsManager {
                 task.run();
             } catch (Exception e) {
                 err = e.getMessage() == null ? e.getClass().getSimpleName() : e.getMessage();
-                AnnoyingClient.LOGGER.debug("Cosmetics {} failed: {}", what, err);
+                AnnoyingClient.LOGGER.debug("Cosmetics {} failed: {}", what, e.toString());
             }
             String result = err;
             mc.execute(() -> {
@@ -336,12 +342,15 @@ public final class CosmeticsManager {
         }, err -> {
             if (err == null) {
                 status = Status.SIGNED_IN;
+                nextRetry = 0; // a later sign-out (server restart) signs in again right away
+                failedSignIns = 0;
                 nextLookup = 0;
                 nextAnnouncementCheck = 0;
             } else {
                 status = Status.ERROR;
                 error = err;
-                nextRetry = System.currentTimeMillis() + 120_000; // try again in 2 minutes
+                // Try again soon after a first failure (a hiccup, a sleeping server waking up), then every 2 minutes.
+                nextRetry = System.currentTimeMillis() + (failedSignIns++ == 0 ? 15_000 : 120_000);
             }
             if (done != null) {
                 done.accept(err);

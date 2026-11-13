@@ -1,10 +1,13 @@
 package main
 
 import (
+	"context"
 	"crypto/rand"
 	"encoding/hex"
 	"encoding/json"
 	"errors"
+	"fmt"
+	"log"
 	"os"
 	"path/filepath"
 	"slices"
@@ -50,11 +53,36 @@ type Store struct {
 	mu   sync.Mutex
 	path string
 	db   dbFile
+
+	backup   Backup        // optional off-server copy (see backup.go)
+	dirty    chan struct{} // signals RunBackups
+	version  int64         // bumped on every change
+	backedUp int64         // version last uploaded
+	flushMu  sync.Mutex
 }
 
 func openStore(path string) (*Store, error) {
-	s := &Store{path: path}
+	return openStoreWithBackup(path, nil)
+}
+
+// openStoreWithBackup reads the local file, or, when there is none (a fresh server), the backup.
+func openStoreWithBackup(path string, backup Backup) (*Store, error) {
+	s := &Store{path: path, backup: backup, dirty: make(chan struct{}, 1)}
 	data, err := os.ReadFile(path)
+	if errors.Is(err, os.ErrNotExist) && backup != nil {
+		ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
+		data, err = backup.Load(ctx)
+		cancel()
+		if err != nil {
+			// Never start empty when the backup exists but can't be read: the next save would erase it.
+			return nil, fmt.Errorf("cannot read the backup (%s): %w", backup.Name(), err)
+		}
+		if data == nil {
+			err = os.ErrNotExist
+		} else {
+			log.Printf("restored the database from %s", backup.Name())
+		}
+	}
 	switch {
 	case errors.Is(err, os.ErrNotExist):
 	case err != nil:
@@ -110,7 +138,11 @@ func (s *Store) saveLocked() error {
 	if err := os.WriteFile(tmp, data, 0o600); err != nil {
 		return err
 	}
-	return os.Rename(tmp, s.path)
+	if err := os.Rename(tmp, s.path); err != nil {
+		return err
+	}
+	s.markDirtyLocked()
+	return nil
 }
 
 func randomHex(n int) string {

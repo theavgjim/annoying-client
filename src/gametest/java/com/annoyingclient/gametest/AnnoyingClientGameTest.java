@@ -83,6 +83,7 @@ public class AnnoyingClientGameTest implements FabricClientGameTest {
 
             testClickGui(ctx);
             testCosmetics(ctx);
+            testSaturationAndEffects(ctx, world);
             testKeybindAndZoom(ctx, world);
             testHudEditor(ctx);
             testConfig(ctx);
@@ -178,26 +179,55 @@ public class AnnoyingClientGameTest implements FabricClientGameTest {
         ctx.takeScreenshot("annoying-12b-mod-configs");
         int listed = ctx.computeOnClient(mc -> com.annoyingclient.modconfig.ModConfigRegistry.mods().size());
         check(listed > 0, "The Mod Configs tab should list the installed mods");
-        if (!net.fabricmc.loader.api.FabricLoader.getInstance().isModLoaded("modmenu")) {
-            return; // the production test run has no Mod Menu; development runs check its settings screen
-        }
-        int index = ctx.computeOnClient(mc -> {
-            var mods = com.annoyingclient.modconfig.ModConfigRegistry.mods();
-            for (int i = 0; i < mods.size(); i++) {
-                if (mods.get(i).id().equals("modmenu")) {
-                    return i;
-                }
-            }
-            return -1;
+        check(ctx.computeOnClient(mc -> ((ClickGuiScreen) mc.screen).modConfigToolbar() != null), "The Mod Configs toolbar should be shown");
+
+        // Libraries (Fabric API) are hidden until the Libraries switch is turned on.
+        check(!visibleMods(ctx).contains("fabric-api"), "Fabric API is a library and should be hidden by default: " + visibleMods(ctx));
+        float[] tb = ctx.computeOnClient(mc -> {
+            var t = ((ClickGuiScreen) mc.screen).modConfigToolbar();
+            return new float[]{t.getX(), t.getY(), t.getWidth()};
         });
-        check(index >= 0, "Mod Menu should be listed in the Mod Configs tab");
-        boolean hasScreen = ctx.computeOnClient(mc -> com.annoyingclient.modconfig.ModConfigRegistry.mods().get(index).hasScreen());
+        click(ctx, tb[0] + tb[2] - 8, tb[1] + 11, GLFW.GLFW_MOUSE_BUTTON_LEFT);
+        ctx.waitTicks(5);
+        check(visibleMods(ctx).contains("fabric-api"), "Fabric API should show with the Libraries switch on");
+        click(ctx, tb[0] + tb[2] - 8, tb[1] + 11, GLFW.GLFW_MOUSE_BUTTON_LEFT);
+        ctx.waitTicks(5);
+        check(!visibleMods(ctx).contains("fabric-api"), "Fabric API should hide again");
+
+        // Live reload through real Cloth Config and YACL configs (no restart). Development runs only.
+        var loader = net.fabricmc.loader.api.FabricLoader.getInstance();
+        if (loader.isModLoaded("cloth-config") && loader.isModLoaded("yet_another_config_lib_v3")) {
+            testLiveReload(ctx);
+        }
+
+        if (!net.fabricmc.loader.api.FabricLoader.getInstance().isModLoaded("modmenu")) {
+            return; // the production test run has no Mod Menu; development runs check its card
+        }
+        // Favorite Mod Menu with its star: it moves to the top and stays in the Favorites filter.
+        float[] card = cardBounds(ctx, "modmenu");
+        check(card != null, "Mod Menu should be listed in the Mod Configs tab");
+        boolean hasScreen = ctx.computeOnClient(mc -> ((ClickGuiScreen) mc.screen).visibleModConfigCard("modmenu").getMod().hasScreen());
         check(hasScreen, "Mod Menu's settings screen should be found through its entrypoint");
-        boolean hasFiles = ctx.computeOnClient(mc -> !com.annoyingclient.modconfig.ModConfigRegistry.mods().get(index).configFiles().isEmpty());
-        float cardY = 48 + index * (34 + 5);
-        float right = 132 + 324 - 10 - (hasFiles ? 14 : 0);
+        float star = card[0] + card[2] - 32 - 58 + 7;
+        click(ctx, star, card[1] + 17, GLFW.GLFW_MOUSE_BUTTON_LEFT);
+        ctx.waitTicks(5);
+        check(ctx.computeOnClient(mc -> com.annoyingclient.modconfig.ModConfigPrefs.get().isFavorite("modmenu")), "The star should make Mod Menu a favorite");
+        check(visibleMods(ctx).getFirst().equals("modmenu"), "Favorites should be listed first: " + visibleMods(ctx));
+        ctx.runOnClient(mc -> {
+            com.annoyingclient.modconfig.ModConfigPrefs.get().setFilter(com.annoyingclient.modconfig.ModConfigPrefs.Filter.FAVORITES);
+            ((ClickGuiScreen) mc.screen).scrollContent(0);
+        });
+        clickTab(ctx, 5);
+        ctx.waitTicks(5);
+        check(visibleMods(ctx).equals(java.util.List.of("modmenu")), "The Favorites filter should show only favorites: " + visibleMods(ctx));
+        ctx.takeScreenshot("annoying-12e-mod-configs-favorites");
+        ctx.runOnClient(mc -> com.annoyingclient.modconfig.ModConfigPrefs.get().setFilter(com.annoyingclient.modconfig.ModConfigPrefs.Filter.ALL));
+        clickTab(ctx, 5);
+        ctx.waitTicks(5);
+
         // The Settings button opens Mod Menu's own config screen, with the ClickGUI as its parent.
-        click(ctx, right - 26, cardY + 17, GLFW.GLFW_MOUSE_BUTTON_LEFT);
+        card = cardBounds(ctx, "modmenu");
+        click(ctx, card[0] + card[2] - 24 - 26, card[1] + 17, GLFW.GLFW_MOUSE_BUTTON_LEFT);
         ctx.waitTicks(10);
         String opened = ctx.computeOnClient(mc -> mc.screen == null ? "none" : mc.screen.getClass().getName());
         check(!opened.equals(ClickGuiScreen.class.getName()) && !opened.equals("none"), "Settings should open the mod's screen, got " + opened);
@@ -205,11 +235,139 @@ public class AnnoyingClientGameTest implements FabricClientGameTest {
         ctx.getInput().pressKey(GLFW.GLFW_KEY_ESCAPE);
         ctx.waitFor(mc -> mc.screen instanceof ClickGuiScreen s && s.isFullyOpen(), 200);
         ctx.waitTicks(5);
-        if (hasFiles) {
-            click(ctx, 200, cardY + 17, GLFW.GLFW_MOUSE_BUTTON_LEFT); // expand the config file editor
-            ctx.waitTicks(12);
-            ctx.takeScreenshot("annoying-12d-mod-config-file-editor");
+        // Clicking the row opens details (description, links) and the config file editor.
+        card = cardBounds(ctx, "modmenu");
+        click(ctx, card[0] + 60, card[1] + 17, GLFW.GLFW_MOUSE_BUTTON_LEFT);
+        ctx.waitTicks(12);
+        ctx.takeScreenshot("annoying-12d-mod-config-details");
+        ctx.runOnClient(mc -> com.annoyingclient.modconfig.ModConfigPrefs.get().toggleFavorite("modmenu"));
+    }
+
+    private void testLiveReload(ClientGameTestContext ctx) {
+        ctx.runOnClient(mc -> LiveReloadConfigs.register());
+        var any = ctx.computeOnClient(mc -> com.annoyingclient.modconfig.ModConfigRegistry.mods().getFirst());
+        for (java.nio.file.Path file : java.util.List.of(LiveReloadConfigs.CLOTH_FILE, LiveReloadConfigs.YACL_FILE)) {
+            String name = file.getFileName().toString();
+            var predicted = ctx.computeOnClient(mc -> com.annoyingclient.modconfig.LiveReload.predict(any, file));
+            check(predicted == com.annoyingclient.modconfig.LiveReload.Mode.LIVE, name + " should be recognised as live-reloadable, got " + predicted);
+            // Edit the file the way the Mod Configs editor does, then apply it.
+            var result = ctx.computeOnClient(mc -> {
+                var cf = com.annoyingclient.modconfig.ConfigFile.load(file);
+                for (var e : cf.entries()) {
+                    if (e.key.equals("fancyMode")) {
+                        e.value = "true";
+                    } else if (e.key.equals("amount")) {
+                        e.value = "42";
+                    }
+                }
+                try {
+                    cf.save();
+                } catch (java.io.IOException ex) {
+                    throw new RuntimeException(ex);
+                }
+                return com.annoyingclient.modconfig.LiveReload.apply(any, file);
+            });
+            check(result == com.annoyingclient.modconfig.LiveReload.Mode.LIVE, name + " should apply live, got " + result);
         }
+        check(ctx.computeOnClient(mc -> LiveReloadConfigs.cloth.getConfig().fancyMode && LiveReloadConfigs.cloth.getConfig().amount == 42),
+                "Cloth Config mod should see the saved values without a restart");
+        check(ctx.computeOnClient(mc -> LiveReloadConfigs.yacl.instance().fancyMode && LiveReloadConfigs.yacl.instance().amount == 42),
+                "YACL mod should see the saved values without a restart");
+        // Undo puts the original file back, and the mod follows.
+        ctx.runOnClient(mc -> {
+            try {
+                com.annoyingclient.modconfig.ConfigFile.restoreBackup(LiveReloadConfigs.CLOTH_FILE);
+            } catch (java.io.IOException ex) {
+                throw new RuntimeException(ex);
+            }
+            com.annoyingclient.modconfig.LiveReload.apply(any, LiveReloadConfigs.CLOTH_FILE);
+        });
+        check(ctx.computeOnClient(mc -> !LiveReloadConfigs.cloth.getConfig().fancyMode && LiveReloadConfigs.cloth.getConfig().amount == 1),
+                "Undo should restore the original values in the running mod");
+        // Mixin switches can't be applied live, and say so.
+        var mixinMode = ctx.computeOnClient(mc -> com.annoyingclient.modconfig.LiveReload.predict(any,
+                net.fabricmc.loader.api.FabricLoader.getInstance().getConfigDir().resolve("lithium.properties")));
+        check(mixinMode == com.annoyingclient.modconfig.LiveReload.Mode.RESTART, "Mixin config files should need a restart, got " + mixinMode);
+    }
+
+    private static void setField(Object target, String name, Object value) {
+        try {
+            var f = target.getClass().getDeclaredField(name);
+            f.setAccessible(true);
+            f.set(target, value);
+        } catch (ReflectiveOperationException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static Object getField(Object target, String name) {
+        try {
+            var f = target.getClass().getDeclaredField(name);
+            f.setAccessible(true);
+            return f.get(target);
+        } catch (ReflectiveOperationException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private java.util.List<String> visibleMods(ClientGameTestContext ctx) {
+        return ctx.computeOnClient(mc -> ((ClickGuiScreen) mc.screen).visibleModConfigIds());
+    }
+
+    /** {x, y, width} of a mod's card in ClickGUI coordinates, scrolled into view; null if not listed. */
+    private float[] cardBounds(ClientGameTestContext ctx, String modId) {
+        for (int attempt = 0; attempt < 30; attempt++) {
+            float[] b = ctx.computeOnClient(mc -> {
+                var card = ((ClickGuiScreen) mc.screen).visibleModConfigCard(modId);
+                return card == null ? null : new float[]{card.getX(), card.getY(), card.getWidth()};
+            });
+            if (b == null) {
+                return null;
+            }
+            if (b[1] >= 40 && b[1] + 34 <= 300) {
+                return b;
+            }
+            float delta = b[1] < 40 ? -60 : 60;
+            ctx.runOnClient(mc -> ((ClickGuiScreen) mc.screen).scrollContent(delta));
+            ctx.waitTicks(4);
+        }
+        return null;
+    }
+
+    // ---- saturation and potion effects --------------------------------------------------------
+
+    private void testSaturationAndEffects(ClientGameTestContext ctx, TestSingleplayerContext world) {
+        world.getServer().runCommand("effect give @a minecraft:speed 90 1");
+        world.getServer().runCommand("effect give @a minecraft:slowness 9 0");
+        world.getServer().runCommand("effect give @a minecraft:haste 300 2");
+        world.getServer().runCommand("item replace entity @a weapon.mainhand with minecraft:bread 16");
+        world.getServer().runOnServer(server -> {
+            var p = server.getPlayerList().getPlayers().getFirst();
+            p.getFoodData().setFoodLevel(12);
+            p.getFoodData().setSaturation(3f);
+        });
+        var saturation = AnnoyingClient.modules().get(com.annoyingclient.module.impl.visual.SaturationModule.class);
+        var effects = AnnoyingClient.modules().get(com.annoyingclient.hud.element.PotionEffectsHud.class);
+        ctx.runOnClient(mc -> {
+            saturation.setEnabled(true, false);
+            effects.setEnabled(true, false);
+            for (var setting : saturation.getSettings()) {
+                if (setting.getName().equals("Show Numbers") && setting instanceof com.annoyingclient.setting.BooleanSetting b) {
+                    b.setValue(true);
+                }
+            }
+        });
+        // The client learns the new food values from the server.
+        ctx.waitFor(mc -> mc.player.getFoodData().getFoodLevel() == 12 && Math.abs(mc.player.getFoodData().getSaturationLevel() - 3f) < 0.01f, 100);
+        ctx.waitFor(mc -> mc.player.getActiveEffects().size() == 3, 100);
+        check(ctx.computeOnClient(mc -> effects.hidesVanillaIcons()), "The Potion Effects HUD should hide the vanilla icons by default");
+        ctx.waitTicks(10);
+        ctx.takeScreenshot("annoying-26-saturation-and-potion-effects");
+        // Clean up for the following tests.
+        world.getServer().runCommand("effect clear @a");
+        world.getServer().runCommand("item replace entity @a weapon.mainhand with minecraft:air");
+        world.getServer().runOnServer(server -> server.getPlayerList().getPlayers().getFirst().getFoodData().setFoodLevel(20));
+        ctx.runOnClient(mc -> saturation.setEnabled(false, false));
     }
 
     // ---- cosmetics, wardrobe and admin tools ---------------------------------------------------
@@ -231,12 +389,25 @@ public class AnnoyingClientGameTest implements FabricClientGameTest {
         ctx.runOnClient(mc -> AnnoyingClient.modules().get(com.annoyingclient.module.impl.visual.CosmeticsModule.class).setServerUrl(url));
         ctx.waitFor(mc -> cos.status() == com.annoyingclient.cosmetics.CosmeticsManager.Status.SIGNED_IN
                 || cos.status() == com.annoyingclient.cosmetics.CosmeticsManager.Status.ERROR, 400);
+        if (cos.status() != com.annoyingclient.cosmetics.CosmeticsManager.Status.SIGNED_IN) {
+            // An attempt made while the game was still starting can fail; the Retry button signs in again.
+            AnnoyingClient.LOGGER.warn("First cosmetics sign-in failed ({}); retrying", cos.error());
+            ctx.runOnClient(mc -> cos.signIn(null));
+            ctx.waitFor(mc -> cos.status() == com.annoyingclient.cosmetics.CosmeticsManager.Status.SIGNED_IN
+                    || cos.status() == com.annoyingclient.cosmetics.CosmeticsManager.Status.ERROR, 400);
+        }
         check(cos.status() == com.annoyingclient.cosmetics.CosmeticsManager.Status.SIGNED_IN, "Should sign in to the cosmetics server: " + cos.error());
         // The development run's player (Player0) is in ADMINS; production runs use a random name and must NOT be admin.
         String playerName = ctx.computeOnClient(mc -> mc.getUser().getName());
         boolean expectAdmin = playerName.equals("Player0");
         check(cos.profile().admin() == expectAdmin, playerName + " admin=" + cos.profile().admin() + ", expected " + expectAdmin);
         check(cos.profile().owner() == expectAdmin, playerName + " owner=" + cos.profile().owner() + ", expected " + expectAdmin);
+        // A server restart forgets every login (sessions are not backed up): the client signs back in by itself.
+        ctx.runOnClient(mc -> setField(cos, "token", "expired-after-server-restart"));
+        ctx.runOnClient(mc -> cos.equip("trail", null, e -> {}));
+        ctx.waitFor(mc -> cos.status() == com.annoyingclient.cosmetics.CosmeticsManager.Status.SIGNED_IN
+                && !"expired-after-server-restart".equals(getField(cos, "token")), 400);
+        check(cos.profile() != null, "Profile should be back after signing in again");
         int start = cos.profile().coins();
 
         // Daily reward through the button.
@@ -307,19 +478,18 @@ public class AnnoyingClientGameTest implements FabricClientGameTest {
         ctx.waitTicks(8);
         ctx.takeScreenshot("annoying-24-cape-third-person");
 
-        // Cape styles, seen from the side in the Wardrobe preview: vanilla, thin (the default) and thin + wavy.
+        // Cape styles, seen from the side in the Wardrobe preview: vanilla and thin (the default).
         var capes = AnnoyingClient.modules().get(com.annoyingclient.module.impl.visual.CosmeticsModule.class);
-        check(capes.thinCapes() && !capes.wavyCapes(), "Thin capes should be on and wavy capes off by default");
+        check(capes.thinCapes(), "Thin capes should be on by default");
         ctx.getInput().pressKey(GLFW.GLFW_KEY_RIGHT_SHIFT);
         ctx.waitFor(mc -> mc.screen instanceof ClickGuiScreen s && s.isFullyOpen());
         clickTab(ctx, 6);
         ctx.waitFor(mc -> ((ClickGuiScreen) mc.screen).wardrobe() != null);
         ctx.runOnClient(mc -> ((ClickGuiScreen) mc.screen).wardrobe().setPreviewYaw(90));
-        String[][] styles = {{"classic", "false", "false"}, {"thin", "true", "false"}, {"wavy", "true", "true"}};
+        String[][] styles = {{"classic", "false"}, {"thin", "true"}};
         for (String[] style : styles) {
             ctx.runOnClient(mc -> {
                 capes.thinCapesSetting().setValue(Boolean.parseBoolean(style[1]));
-                capes.wavyCapesSetting().setValue(Boolean.parseBoolean(style[2]));
             });
             long before = com.annoyingclient.cosmetics.CapeRenderer.drawn;
             ctx.waitTicks(3);
@@ -330,7 +500,6 @@ public class AnnoyingClientGameTest implements FabricClientGameTest {
         }
         ctx.getInput().pressKey(GLFW.GLFW_KEY_ESCAPE);
         ctx.waitFor(mc -> mc.screen == null);
-        ctx.runOnClient(mc -> capes.wavyCapesSetting().setValue(false));
         ctx.runOnClient(mc -> mc.options.setCameraType(net.minecraft.client.CameraType.FIRST_PERSON));
     }
 

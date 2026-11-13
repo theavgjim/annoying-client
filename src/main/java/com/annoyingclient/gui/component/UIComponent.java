@@ -27,6 +27,19 @@ public abstract class UIComponent {
 
     public abstract float getHeight();
 
+    /** Position in the screen's local coordinates, as last laid out. */
+    public float getX() {
+        return x;
+    }
+
+    public float getY() {
+        return y;
+    }
+
+    public float getWidth() {
+        return width;
+    }
+
     public abstract void render(GuiGraphics g, float mouseX, float mouseY);
 
     public boolean mouseClicked(float mouseX, float mouseY, int button) {

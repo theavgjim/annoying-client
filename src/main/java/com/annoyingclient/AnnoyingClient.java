@@ -8,6 +8,7 @@ import com.annoyingclient.event.EventBus;
 import com.annoyingclient.gui.clickgui.ClickGuiScreen;
 import com.annoyingclient.hud.HudManager;
 import com.annoyingclient.hud.element.ArmorHud;
+import com.annoyingclient.hud.element.PotionEffectsHud;
 import com.annoyingclient.hud.element.ClockHud;
 import com.annoyingclient.hud.element.CoordinatesHud;
 import com.annoyingclient.hud.element.CpsHud;
@@ -29,6 +30,7 @@ import com.annoyingclient.module.impl.utility.ThemeSwitcherModule;
 import com.annoyingclient.module.impl.visual.CrosshairModule;
 import com.annoyingclient.module.impl.visual.FullbrightModule;
 import com.annoyingclient.module.impl.visual.HudColorsModule;
+import com.annoyingclient.module.impl.visual.SaturationModule;
 import com.annoyingclient.module.impl.visual.ScreenshotModule;
 import com.annoyingclient.module.impl.visual.ZoomModule;
 import com.annoyingclient.module.Module;
@@ -172,6 +174,7 @@ public final class AnnoyingClient implements ClientModInitializer {
         modules.register(new ClockHud());
         modules.register(new KeystrokesHud());
         modules.register(new ArmorHud());
+        modules.register(new PotionEffectsHud());
         // Utility
         modules.register(new ClickGuiModule());
         modules.register(new HudEditorModule());
@@ -183,6 +186,7 @@ public final class AnnoyingClient implements ClientModInitializer {
         modules.register(new CrosshairModule());
         modules.register(new ZoomModule());
         modules.register(new HudColorsModule());
+        modules.register(new SaturationModule());
         modules.register(new ScreenshotModule());
         modules.register(new CosmeticsModule());
         // Miscellaneous

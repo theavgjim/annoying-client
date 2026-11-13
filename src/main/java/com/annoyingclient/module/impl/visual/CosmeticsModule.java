@@ -15,7 +15,6 @@ public class CosmeticsModule extends Module {
     private final StringSetting serverUrl = add(new StringSetting("Server URL", "Cosmetics server address. Empty = the official server, \"off\" = no server", "", 200));
     private final BooleanSetting showOthers = add(new BooleanSetting("Show Other Players", "Show other Annoying Client players' cosmetics", true));
     private final BooleanSetting thinCapes = add(new BooleanSetting("Thin Capes", "Draw capes about a third as thick as vanilla", true));
-    private final BooleanSetting wavyCapes = add(new BooleanSetting("Wavy Capes", "Capes ripple, more while you move", false));
     private final BooleanSetting showTrails = add(new BooleanSetting("Show Trails", "Draw particle trails", true));
     private final StringSetting previewCape = add(new StringSetting("Preview Cape", "", "", 40).hide());
     private final StringSetting previewTrail = add(new StringSetting("Preview Trail", "", "", 40).hide());
@@ -55,16 +54,8 @@ public class CosmeticsModule extends Module {
         return thinCapes.isEnabled();
     }
 
-    public boolean wavyCapes() {
-        return wavyCapes.isEnabled();
-    }
-
     public BooleanSetting thinCapesSetting() {
         return thinCapes;
-    }
-
-    public BooleanSetting wavyCapesSetting() {
-        return wavyCapes;
     }
 
     public boolean showOthers() {
