@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.3.4 (Minecraft 1.21.11)
+
+- **Normal FPS Boosted starts the game right from Annoying Client** (no Minecraft Launcher), with your
+  Microsoft account signed in here, the selected profile's mods (minus Annoying Client) and all its settings.
+  The extra profile that 1.3.2 and 1.3.3 added to the Minecraft Launcher is removed automatically.
+
 ## 1.3.3 (Minecraft 1.21.11)
 
 - **Normal FPS Boosted keeps your settings.** It now uses the profile you play Annoying Client with (the one

@@ -127,7 +127,9 @@ function render() {
   bplay.classList.toggle("running", state.running);
   bplay.disabled = state.busy || state.running;
   $("span", bplay).textContent = state.running ? "RUNNING" : state.busy ? "WORKING..." : "PLAY";
-  $("#boosted-hint").textContent = "Opens the Minecraft Launcher with the \"Normal FPS Boosted (no Annoying Client)\" profile. Press Play there.";
+  $("#boosted-hint").textContent = state.account
+    ? "Starts right here as " + state.account.name + "."
+    : state.testAccount ? "Test build: starts with the test account." : "Starts right here. Sign in with your Microsoft account first (bottom left).";
   $$(".mc-version-copy").forEach((e) => (e.textContent = $("#mc-version").textContent));
 
   const play = $("#play-btn");
@@ -203,9 +205,19 @@ async function loadBoosted() {
 
 async function playBoosted() {
   if (state?.running) { toast("info", "Minecraft is already running", "Close it first to start Normal FPS Boosted."); return; }
-  // Always through the official Minecraft Launcher (no sign-in needed here).
+  // Started directly by Annoying Client, so it needs the Microsoft sign-in (like Direct play).
+  if (!state.account && !state.testAccount) {
+    if (!state.settings.clientId) {
+      show("settings");
+      toast("info", "Sign-in needs setup", "Normal FPS Boosted starts the game from Annoying Client, so it needs your Microsoft account. Add your approved Microsoft application ID here, then sign in.");
+    } else {
+      toast("info", "Sign in first", "Normal FPS Boosted starts the game from Annoying Client with your Microsoft account.");
+      startLogin();
+    }
+    return;
+  }
   setProgress({ stage: "Starting", fraction: 0 });
-  await guarded($("#boosted-play"), () => api("/api/play", { mode: "official", plain: true }));
+  await guarded($("#boosted-play"), () => api("/api/play", { plain: true }));
 }
 $("#boosted-play").addEventListener("click", playBoosted);
 

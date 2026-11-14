@@ -148,3 +148,29 @@ func startOfficialLauncher() error {
 		return errors.New("the profile was added; start the Minecraft Launcher and pick it there")
 	}
 }
+
+// removeOfficialProfile deletes one of this launcher's own profiles from the Minecraft Launcher, if present.
+// Best effort: a missing or unreadable file is left alone.
+func removeOfficialProfile(key string) {
+	mc := minecraftDir()
+	for _, f := range []string{filepath.Join(mc, "launcher_profiles.json"), filepath.Join(mc, "launcher_profiles_microsoft_store.json")} {
+		data, err := os.ReadFile(f)
+		if err != nil {
+			continue
+		}
+		root := map[string]any{}
+		dec := json.NewDecoder(bytes.NewReader(data))
+		dec.UseNumber()
+		if dec.Decode(&root) != nil {
+			continue
+		}
+		profiles, _ := root["profiles"].(map[string]any)
+		if _, ok := profiles[key]; !ok {
+			continue
+		}
+		delete(profiles, key)
+		if out, err := json.MarshalIndent(root, "", "  "); err == nil {
+			_ = writeFileAtomic(f, out)
+		}
+	}
+}

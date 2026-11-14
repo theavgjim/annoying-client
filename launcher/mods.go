@@ -21,7 +21,7 @@ import (
 const (
 	modrinthAPI      = "https://api.modrinth.com/v2"
 	fabricAPIProject = "P7dR8mSH"
-	clientJarName    = "annoying-client-1.3.3+mc1.21.11.jar"
+	clientJarName    = "annoying-client-1.3.4+mc1.21.11.jar"
 	clientModID      = "annoyingclient"
 )
 

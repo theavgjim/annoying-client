@@ -8,19 +8,18 @@ import (
 	"path/filepath"
 	"sort"
 	"strings"
+	"time"
 )
 
 // "Normal FPS Boosted Minecraft": the selected profile's game folder, settings and mods, started WITHOUT
 // the Annoying Client mod. The mods folder itself is never changed: the enabled mods are
 // linked (or copied) into a separate folder, and Fabric is pointed at it with -Dfabric.modsFolder.
 
-// plainModsFolder lives inside the game folder and is passed as a relative path: the game always runs
-// with the game folder as its working directory, and a relative path never has spaces in it (Windows user
-// folders often do, and the official launcher splits Java arguments on spaces).
+// plainModsFolder lives inside the game folder.
 const plainModsFolder = "mods-without-annoying-client"
 
+// plainOfficialKey is the Minecraft Launcher profile that versions 1.3.2-1.3.3 created for this mode.
 const plainOfficialKey = officialProfileKey + "-plain"
-const plainOfficialName = "Normal FPS Boosted (no Annoying Client)"
 
 // isClientMod reports whether a mod file is Annoying Client itself.
 func isClientMod(path string) bool {
@@ -118,8 +117,8 @@ func (a *App) plainInfo() (any, error) {
 	return map[string]any{"profile": profile.Name, "mods": out}, nil
 }
 
-// playPlain starts "Normal FPS Boosted Minecraft" through the official Minecraft Launcher: it adds (or
-// updates) a "Normal FPS Boosted (no Annoying Client)" profile there and opens the launcher.
+// playPlain starts "Normal FPS Boosted Minecraft" directly from this launcher (like Direct play), with the
+// signed-in Microsoft account, the selected profile's game folder and its mods minus Annoying Client.
 func (a *App) playPlain() {
 	ctx := context.Background()
 	fail := func(err error) {
@@ -133,30 +132,37 @@ func (a *App) playPlain() {
 		fail(err)
 		return
 	}
-	if err := a.game.begin(); err != nil {
+	acc, err := a.launchAccount(ctx)
+	if err != nil {
 		fail(err)
 		return
 	}
-	err = func() error {
-		defer a.game.end()
-		if err := a.prepareOfficialFor(ctx, paths, mods); err != nil {
-			return err
+	// Versions 1.3.2 and 1.3.3 added a profile for this mode to the Minecraft Launcher; it is not used any more.
+	removeOfficialProfile(plainOfficialKey)
+	dst := filepath.Join(paths.Instance, plainModsFolder)
+	spec := launchSpec{
+		paths:       paths,
+		mods:        mods,
+		extraJVM:    []string{"-Dfabric.modsFolder=" + dst},
+		versionType: "Fabric",
+		beforeStart: func() error {
+			names, err := syncPlainMods(paths.Mods, dst)
+			if err != nil {
+				return err
+			}
+			logf("plain mode: %d mods without Annoying Client", len(names))
+			return nil
+		},
+	}
+	err = a.game.LaunchSpec(ctx, acc, spec, func(code int, d time.Duration) {
+		if code != 0 && d < 2*time.Minute {
+			a.events.notify("error", "Minecraft closed unexpectedly", fmt.Sprintf("Exit code %d. Open the Console tab for details.", code))
 		}
-		names, err := syncPlainMods(paths.Mods, filepath.Join(paths.Instance, plainModsFolder))
-		if err != nil {
-			return err
-		}
-		logf("plain mode: %d mods without Annoying Client", len(names))
-		_, profile, err := fetchFabricProfile(ctx, paths)
-		if err != nil {
-			return err
-		}
-		return a.game.playOfficialProfile(profile, plainOfficialKey, plainOfficialName, paths.Instance, []string{"-Dfabric.modsFolder=" + plainModsFolder})
-	}()
+	})
 	if err != nil {
 		fail(err)
 		return
 	}
 	a.events.Send("progress", nil)
-	a.events.notify("success", "Opening the Minecraft Launcher", "Pick the \""+plainOfficialName+"\" profile and press Play")
+	a.events.notify("success", "Minecraft is starting", "Normal FPS Boosted: your mods and settings, without Annoying Client")
 }

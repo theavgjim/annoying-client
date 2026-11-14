@@ -354,7 +354,7 @@ func (a *App) handlePlay(r *http.Request) (any, error) {
 		in.Mode = a.settings.Get().LaunchMode
 	}
 	if in.Plain {
-		go a.playPlain() // always through the official Minecraft Launcher
+		go a.playPlain() // started directly by this launcher
 		return nil, nil
 	}
 	go a.play(in.Mode)
