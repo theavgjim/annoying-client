@@ -1,10 +1,10 @@
 {
-  "version": "1.3.0",
-  "notes": "Mod Configs apply without restarting, favorites and filters, a Saturation module, a Potion Effects HUD, and coins and cosmetics are kept.",
-  "published": "2026-11-13T21:21:37Z",
+  "version": "1.3.1",
+  "notes": "New: Normal FPS Boosted Minecraft in the launcher sidebar (your mods, without Annoying Client).",
+  "published": "2026-11-14T09:12:27Z",
   "windows": {
     "url": "https://raw.githubusercontent.com/theavgjim/annoying-client/main/docs/download/AnnoyingClient.exe",
-    "sha256": "4fdfbf61234fecf9deb52e8930c4c261614b9e13f239914b0cdd5f39158601b4",
-    "size": 8300544
+    "sha256": "511dbe7f6d2a13bf0194c65d4fdd33c96245d0bac22d0b99f5a291ac86b94c36",
+    "size": 8326656
   }
 }

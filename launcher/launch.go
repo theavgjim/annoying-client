@@ -98,31 +98,50 @@ type prepared struct {
 	java      string
 }
 
+// launchSpec says which game folder and mods to start with. The normal launch uses the active profile;
+// "Normal FPS Boosted" uses the default profile without Annoying Client (see plain.go).
+type launchSpec struct {
+	paths       Paths
+	mods        *ModManager
+	extraJVM    []string     // added after the memory arguments
+	versionType string       // shown on the title screen
+	beforeStart func() error // runs after the downloads, before Java starts
+}
+
+func (g *Game) defaultSpec() launchSpec {
+	return launchSpec{paths: g.paths, mods: g.mods, versionType: "Annoying Client"}
+}
+
 // Prepare downloads and verifies the game, libraries, assets, Java and core mods.
 func (g *Game) Prepare(ctx context.Context) (*prepared, error) {
+	return g.prepare(ctx, g.defaultSpec())
+}
+
+func (g *Game) prepare(ctx context.Context, spec launchSpec) (*prepared, error) {
 	const steps = 6
 	s := g.settings.Get()
-	if err := g.paths.ensure(); err != nil {
+	paths := spec.paths
+	if err := paths.ensure(); err != nil {
 		return nil, err
 	}
 	g.progress(0, steps, Progress{Stage: "Checking game version"})
-	vanilla, err := fetchVanillaVersion(ctx, g.paths, minecraftVersion)
+	vanilla, err := fetchVanillaVersion(ctx, paths, minecraftVersion)
 	if err != nil {
 		return nil, err
 	}
-	fabric, _, err := fetchFabricProfile(ctx, g.paths)
+	fabric, _, err := fetchFabricProfile(ctx, paths)
 	if err != nil {
 		return nil, err
 	}
 	v := mergeVersions(vanilla, fabric)
 
-	clientJarPath := filepath.Join(g.paths.Versions, minecraftVersion, minecraftVersion+".jar")
+	clientJarPath := filepath.Join(paths.Versions, minecraftVersion, minecraftVersion+".jar")
 	client, ok := vanilla.Downloads["client"]
 	if !ok {
 		return nil, errors.New("mojang's version file has no client download")
 	}
 	jobs := []DownloadJob{{URL: client.URL, Path: clientJarPath, SHA1: client.SHA1, Size: client.Size}}
-	libJobs, classpath, err := libraryJobs(g.paths, v)
+	libJobs, classpath, err := libraryJobs(paths, v)
 	if err != nil {
 		return nil, err
 	}
@@ -133,7 +152,7 @@ func (g *Game) Prepare(ctx context.Context) (*prepared, error) {
 	classpath = append(classpath, clientJarPath)
 
 	g.progress(2, steps, Progress{Stage: "Checking assets"})
-	assets, err := assetJobs(ctx, g.paths, vanilla)
+	assets, err := assetJobs(ctx, paths, vanilla)
 	if err != nil {
 		return nil, err
 	}
@@ -144,7 +163,7 @@ func (g *Game) Prepare(ctx context.Context) (*prepared, error) {
 	java := strings.TrimSpace(s.JavaPath)
 	if java == "" {
 		g.progress(3, steps, Progress{Stage: "Checking Java"})
-		java, err = ensureJava(ctx, g.paths, vanilla.JavaVersion.Component, s.DownloadThreads, func(p Progress) { g.progress(3, steps, p) })
+		java, err = ensureJava(ctx, paths, vanilla.JavaVersion.Component, s.DownloadThreads, func(p Progress) { g.progress(3, steps, p) })
 		if err != nil {
 			return nil, err
 		}
@@ -153,13 +172,13 @@ func (g *Game) Prepare(ctx context.Context) (*prepared, error) {
 	}
 
 	g.progress(4, steps, Progress{Stage: "Installing Annoying Client"})
-	if err := g.mods.EnsureCore(ctx); err != nil {
+	if err := spec.mods.EnsureCore(ctx); err != nil {
 		return nil, fmt.Errorf("cannot install core mods: %w", err)
 	}
-	if _, err := os.Stat(filepath.Join(g.paths.Instance, "options.txt")); errors.Is(err, os.ErrNotExist) {
+	if _, err := os.Stat(filepath.Join(paths.Instance, "options.txt")); errors.Is(err, os.ErrNotExist) {
 		// First start: use the Balanced preset so the game runs well out of the box.
 		if preset := findPreset("balanced"); preset != nil {
-			_ = applyOptions(g.paths.Instance, preset.Options, worldVersion(clientJarPath))
+			_ = applyOptions(paths.Instance, preset.Options, worldVersion(clientJarPath))
 			_, _ = g.settings.Update(func(s *Settings) { s.FPSPreset = "balanced" })
 		}
 	}
@@ -175,11 +194,11 @@ func classpathSeparator() string {
 }
 
 // buildArgs expands the version's argument templates for this account and these settings.
-func (g *Game) buildArgs(p *prepared, acc LaunchAccount, s Settings) []string {
+func (g *Game) buildArgs(p *prepared, acc LaunchAccount, s Settings, spec launchSpec) []string {
 	vars := map[string]string{
 		"auth_player_name":    acc.Name,
 		"version_name":        p.version.ID,
-		"game_directory":      g.paths.Instance,
+		"game_directory":      spec.paths.Instance,
 		"assets_root":         g.paths.Assets,
 		"assets_index_name":   p.version.AssetIndex.ID,
 		"auth_uuid":           acc.UUID,
@@ -187,7 +206,7 @@ func (g *Game) buildArgs(p *prepared, acc LaunchAccount, s Settings) []string {
 		"clientid":            "",
 		"auth_xuid":           "",
 		"user_type":           acc.UserType,
-		"version_type":        "Annoying Client",
+		"version_type":        spec.versionType,
 		"natives_directory":   g.paths.Natives,
 		"launcher_name":       "annoying-client",
 		"launcher_version":    launcherVersion,
@@ -226,6 +245,7 @@ func (g *Game) buildArgs(p *prepared, acc LaunchAccount, s Settings) []string {
 		return out
 	}
 	args := jvmArgs(s)
+	args = append(args, spec.extraJVM...)
 	args = append(args, expand(p.version.Arguments.JVM)...)
 	args = append(args, p.version.MainClass)
 	args = append(args, expand(p.version.Arguments.Game)...)
@@ -259,18 +279,28 @@ func redactArgs(args []string, token string) string {
 
 // Launch starts Minecraft directly with the given account. It returns once the process has started.
 func (g *Game) Launch(ctx context.Context, acc LaunchAccount, onExit func(code int, runtime time.Duration)) error {
+	return g.LaunchSpec(ctx, acc, g.defaultSpec(), onExit)
+}
+
+// LaunchSpec starts the game with the given folders and extra arguments.
+func (g *Game) LaunchSpec(ctx context.Context, acc LaunchAccount, spec launchSpec, onExit func(code int, runtime time.Duration)) error {
 	if err := g.begin(); err != nil {
 		return err
 	}
 	defer g.end()
-	p, err := g.Prepare(ctx)
+	p, err := g.prepare(ctx, spec)
 	if err != nil {
 		return err
 	}
+	if spec.beforeStart != nil {
+		if err := spec.beforeStart(); err != nil {
+			return err
+		}
+	}
 	s := g.settings.Get()
-	args := g.buildArgs(p, acc, s)
+	args := g.buildArgs(p, acc, s, spec)
 	cmd := exec.Command(p.java, args...)
-	cmd.Dir = g.paths.Instance
+	cmd.Dir = spec.paths.Instance
 	hideConsole(cmd)
 	stdout, _ := cmd.StdoutPipe()
 	stderr, _ := cmd.StderrPipe()

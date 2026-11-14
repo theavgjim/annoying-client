@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.3.1 (Minecraft 1.21.11)
+
+- **Normal FPS Boosted Minecraft** (launcher sidebar): starts Minecraft with your mods from the
+  Annoying Client profile, but without the Annoying Client mod. Same worlds, options and FPS settings. Clicking
+  it starts the game right away. Works with Direct launch and with the Minecraft Launcher (adds a
+  "Normal FPS Boosted (no Annoying Client)" profile there). Your mods folder is never changed: the enabled
+  mods are linked into a separate folder and Fabric is pointed at it.
+
 ## 1.3.0 (Minecraft 1.21.11)
 
 - **Mod Configs: changes apply without restarting.** Saving a config file reloads it into the running mod for

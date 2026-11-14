@@ -126,6 +126,7 @@ func (a *App) routes() http.Handler {
 	api("/api/login/start", a.handleLoginStart)
 	api("/api/logout", func(r *http.Request) (any, error) { a.auth.Logout(); a.events.Send("state", nil); return nil, nil })
 	api("/api/play", a.handlePlay)
+	api("/api/plain", func(r *http.Request) (any, error) { return a.plainInfo() })
 	api("/api/stop", func(r *http.Request) (any, error) { return nil, a.game.Stop() })
 	api("/api/logs", func(r *http.Request) (any, error) { return a.game.Logs(), nil })
 	api("/api/mods", func(r *http.Request) (any, error) { return a.mods.List() })
@@ -343,13 +344,18 @@ func (a *App) handleLoginStart(r *http.Request) (any, error) {
 
 func (a *App) handlePlay(r *http.Request) (any, error) {
 	var in struct {
-		Mode string `json:"mode"`
+		Mode  string `json:"mode"`
+		Plain bool   `json:"plain"` // Normal FPS Boosted: without Annoying Client
 	}
 	if err := decode(r, &in); err != nil {
 		return nil, err
 	}
 	if in.Mode == "" {
 		in.Mode = a.settings.Get().LaunchMode
+	}
+	if in.Plain {
+		go a.playPlain(in.Mode)
+		return nil, nil
 	}
 	go a.play(in.Mode)
 	return nil, nil
@@ -430,18 +436,22 @@ func (a *App) dataVersion(ctx context.Context, report func(Progress)) (int, erro
 
 // prepareOfficial does the part of Prepare that the official launcher does not do for us.
 func (a *App) prepareOfficial(ctx context.Context) error {
-	if err := a.paths.ensure(); err != nil {
+	return a.prepareOfficialFor(ctx, a.paths, a.mods)
+}
+
+func (a *App) prepareOfficialFor(ctx context.Context, paths Paths, mods *ModManager) error {
+	if err := paths.ensure(); err != nil {
 		return err
 	}
-	a.game.progress(0, 3, Progress{Stage: "Installing Annoying Client"})
-	if err := a.mods.EnsureCore(ctx); err != nil {
+	a.game.progress(0, 3, Progress{Stage: "Installing mods"})
+	if err := mods.EnsureCore(ctx); err != nil {
 		return err
 	}
-	if _, err := os.Stat(filepath.Join(a.paths.Instance, "options.txt")); errors.Is(err, os.ErrNotExist) {
+	if _, err := os.Stat(filepath.Join(paths.Instance, "options.txt")); errors.Is(err, os.ErrNotExist) {
 		a.game.progress(1, 3, Progress{Stage: "Applying the Balanced preset"})
 		if dv, err := a.dataVersion(ctx, func(p Progress) { a.game.progress(1, 3, p) }); err == nil {
 			if preset := findPreset("balanced"); preset != nil {
-				_ = applyOptions(a.paths.Instance, preset.Options, dv)
+				_ = applyOptions(paths.Instance, preset.Options, dv)
 				_, _ = a.settings.Update(func(s *Settings) { s.FPSPreset = "balanced" })
 			}
 		}

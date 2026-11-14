@@ -1,6 +1,7 @@
 package main
 
 import (
+	"archive/zip"
 	"encoding/json"
 	"os"
 	"path/filepath"
@@ -70,7 +71,7 @@ func TestBuildArgs(t *testing.T) {
 	v.Arguments.JVM = []json.RawMessage{json.RawMessage(`"-cp"`), json.RawMessage(`"${classpath}"`)}
 	s := defaultSettings()
 	s.Width = 1600
-	args := g.buildArgs(&prepared{version: v, classpath: []string{"a.jar", "b.jar"}}, LaunchAccount{Name: "Steve", AccessToken: "tok-0123456789abcdef"}, s)
+	args := g.buildArgs(&prepared{version: v, classpath: []string{"a.jar", "b.jar"}}, LaunchAccount{Name: "Steve", AccessToken: "tok-0123456789abcdef"}, s, g.defaultSpec())
 	joined := strings.Join(args, " ")
 	for _, want := range []string{"-Xmx", "-cp a.jar" + classpathSeparator() + "b.jar", "Main --username Steve --width 1600"} {
 		if !strings.Contains(joined, want) {
@@ -142,5 +143,62 @@ func TestVersionNewer(t *testing.T) {
 		if got := versionNewer(c.a, c.b); got != c.want {
 			t.Errorf("versionNewer(%q, %q) = %v, want %v", c.a, c.b, got, c.want)
 		}
+	}
+}
+
+func TestPlainModsWithoutClient(t *testing.T) {
+	dir := t.TempDir()
+	src := filepath.Join(dir, "mods")
+	dst := filepath.Join(dir, plainModsFolder)
+	_ = os.MkdirAll(src, 0o755)
+	write := func(name, id string) {
+		path := filepath.Join(src, name)
+		f, _ := os.Create(path)
+		zw := zip.NewWriter(f)
+		w, _ := zw.Create("fabric.mod.json")
+		_, _ = w.Write([]byte(`{"schemaVersion":1,"id":"` + id + `","version":"1","name":"` + id + `"}`))
+		_ = zw.Close()
+		_ = f.Close()
+	}
+	write("sodium.jar", "sodium")
+	write("fabric-api.jar", "fabric-api")
+	write("annoying-client-1.3.0+mc1.21.11.jar", "annoyingclient")
+	write("renamed-client.jar", "annoyingclient") // found by its mod id, not only its file name
+	write("lithium.jar.disabled", "lithium")      // disabled mods stay off
+	_ = os.MkdirAll(dst, 0o755)
+	_ = os.WriteFile(filepath.Join(dst, "removed-since.jar"), []byte("old"), 0o644)
+
+	names, err := syncPlainMods(src, dst)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if strings.Join(names, ",") != "fabric-api.jar,sodium.jar" {
+		t.Fatalf("plain mods = %v", names)
+	}
+	entries, _ := os.ReadDir(dst)
+	var got []string
+	for _, e := range entries {
+		got = append(got, e.Name())
+	}
+	if strings.Join(got, ",") != "fabric-api.jar,sodium.jar" {
+		t.Fatalf("folder holds %v, want only the two mods (stale files removed)", got)
+	}
+	if _, err := os.Stat(filepath.Join(src, "annoying-client-1.3.0+mc1.21.11.jar")); err != nil {
+		t.Fatal("the real mods folder must not be changed")
+	}
+
+	// Direct launch passes the folder to Fabric; the normal launch does not.
+	g := &Game{paths: newPaths(dir)}
+	v := &VersionJSON{ID: "fabric-test", MainClass: "Main"}
+	spec := g.defaultSpec()
+	spec.extraJVM = []string{"-Dfabric.modsFolder=" + dst}
+	spec.versionType = "Fabric"
+	args := strings.Join(g.buildArgs(&prepared{version: v}, LaunchAccount{Name: "Steve"}, defaultSettings(), spec), " ")
+	if !strings.Contains(args, "-Dfabric.modsFolder="+dst+" ") || strings.Index(args, "-Dfabric.modsFolder") > strings.Index(args, "Main") {
+		t.Fatalf("modsFolder must be a JVM argument before the main class: %s", args)
+	}
+	normal := strings.Join(g.buildArgs(&prepared{version: v}, LaunchAccount{Name: "Steve"}, defaultSettings(), g.defaultSpec()), " ")
+	if strings.Contains(normal, "modsFolder") {
+		t.Fatal("the normal launch must use the regular mods folder")
 	}
 }

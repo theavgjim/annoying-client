@@ -53,8 +53,13 @@ function show(page) {
   if (page === "performance") loadPerformance();
   if (page === "console") renderConsole();
   if (page === "settings") fillSettings();
+  if (page === "boosted") loadBoosted();
 }
-$$(".nav").forEach((b) => b.addEventListener("click", () => show(b.dataset.page)));
+$$(".nav").forEach((b) => b.addEventListener("click", () => {
+  show(b.dataset.page);
+  // Clicking "Normal FPS Boosted Minecraft" starts the game right away.
+  if (b.dataset.page === "boosted" && state && !state.busy && !state.running) playBoosted();
+}));
 $$("[data-goto]").forEach((b) => b.addEventListener("click", () => show(b.dataset.goto)));
 document.addEventListener("click", (e) => {
   const open = e.target.closest("[data-open]");
@@ -118,6 +123,15 @@ function render() {
   }
   $("#version-line").textContent = "You have " + state.version + (up ? ". Version " + up.version + " is available." : state.updateError ? ". " + state.updateError : ".");
 
+  const bplay = $("#boosted-play");
+  bplay.classList.toggle("running", state.running);
+  bplay.disabled = state.busy || state.running;
+  $("span", bplay).textContent = state.running ? "RUNNING" : state.busy ? "WORKING..." : "PLAY";
+  $("#boosted-hint").textContent = mode === "official"
+    ? "Opens the Minecraft Launcher with the \"Normal FPS Boosted (no Annoying Client)\" profile."
+    : "Starts directly with your signed-in account.";
+  $$(".mc-version-copy").forEach((e) => (e.textContent = $("#mc-version").textContent));
+
   const play = $("#play-btn");
   play.classList.toggle("running", state.running);
   play.disabled = state.busy && !state.running;
@@ -127,15 +141,21 @@ function render() {
 }
 
 function setProgress(p) {
-  const box = $("#progress");
-  if (!p) { box.classList.add("hidden"); return; }
-  box.classList.remove("hidden");
-  $("#progress-stage").textContent = p.stage || "Working";
+  // Shown on the Play page and on the Normal FPS Boosted page.
+  const boxes = [
+    { box: $("#progress"), stage: $("#progress-stage"), detail: $("#progress-detail"), fill: $("#progress-fill") },
+    { box: $("#boosted-progress"), stage: $("#boosted-progress .progress-stage"), detail: $("#boosted-progress .progress-detail"), fill: $("#boosted-progress .fill") },
+  ];
   let detail = "";
-  if (p.totalBytes > 0) detail = `${(p.bytes / 1048576).toFixed(1)} / ${(p.totalBytes / 1048576).toFixed(1)} MB`;
-  else if (p.total > 0) detail = `${p.done} / ${p.total}`;
-  $("#progress-detail").textContent = detail;
-  $("#progress-fill").style.width = `${Math.round(Math.min(1, Math.max(0, p.fraction || 0)) * 100)}%`;
+  if (p && p.totalBytes > 0) detail = `${(p.bytes / 1048576).toFixed(1)} / ${(p.totalBytes / 1048576).toFixed(1)} MB`;
+  else if (p && p.total > 0) detail = `${p.done} / ${p.total}`;
+  for (const b of boxes) {
+    if (!p) { b.box.classList.add("hidden"); continue; }
+    b.box.classList.remove("hidden");
+    b.stage.textContent = p.stage || "Working";
+    b.detail.textContent = detail;
+    b.fill.style.width = `${Math.round(Math.min(1, Math.max(0, p.fraction || 0)) * 100)}%`;
+  }
 }
 
 // ---- play ---------------------------------------------------------------------------------
@@ -155,6 +175,48 @@ $("#play-btn").addEventListener("click", async () => {
   setProgress({ stage: "Starting", fraction: 0 });
   await guarded($("#play-btn"), () => api("/api/play", { mode }));
 });
+
+// ---- normal FPS boosted minecraft (no Annoying Client) --------------------------------------
+
+async function loadBoosted() {
+  try {
+    const info = await api("/api/plain");
+    const mods = info.mods || [];
+    $("#boosted-count").textContent = "(" + mods.length + ")";
+    const box = $("#boosted-mods");
+    box.innerHTML = "";
+    if (!mods.length) {
+      box.innerHTML = '<span class="empty">Only Minecraft and Fabric: the Annoying Client profile has no other mods yet.</span>';
+    }
+    for (const m of mods) {
+      const chip = document.createElement("span");
+      chip.className = "chip";
+      const icon = m.icon ? document.createElement("img") : document.createElement("i");
+      if (m.icon) { icon.src = m.icon; icon.alt = ""; icon.loading = "lazy"; }
+      chip.append(icon, document.createTextNode(m.name || m.file));
+      chip.title = (m.name || m.file) + (m.version ? " " + m.version : "");
+      box.appendChild(chip);
+    }
+  } catch (e) {
+    toast("error", "Could not list the mods", e.message);
+  }
+}
+
+async function playBoosted() {
+  if (state?.running) { toast("info", "Minecraft is already running", "Close it first to start Normal FPS Boosted."); return; }
+  if (mode === "direct" && !state.account && !state.testAccount) {
+    if (!state.settings.clientId) {
+      show("settings");
+      toast("info", "Direct launch needs setup", "Add an approved Microsoft application ID, or play via the Minecraft Launcher.");
+    } else {
+      startLogin();
+    }
+    return;
+  }
+  setProgress({ stage: "Starting", fraction: 0 });
+  await guarded($("#boosted-play"), () => api("/api/play", { mode, plain: true }));
+}
+$("#boosted-play").addEventListener("click", playBoosted);
 
 // ---- updates ------------------------------------------------------------------------------
 

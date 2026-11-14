@@ -25,6 +25,11 @@ const officialProfileKey = "annoying-client"
 // which signs in with the player's Microsoft account. The launcher profile points at this
 // launcher's game folder, so mods, settings and optimizations are shared between both modes.
 func (g *Game) PlayOfficial(fabricProfile []byte, profileID, profileName string) error {
+	return g.playOfficialProfile(fabricProfile, officialKey(profileID), officialName(profileID, profileName), g.paths.Instance, nil)
+}
+
+// playOfficialProfile writes (or updates) one profile in the official launcher and opens it.
+func (g *Game) playOfficialProfile(fabricProfile []byte, key, name, gameDir string, extraJavaArgs []string) error {
 	mc := minecraftDir()
 	if st, err := os.Stat(mc); err != nil || !st.IsDir() {
 		return errors.New("the official Minecraft Launcher is not installed (no .minecraft folder). Install it from minecraft.net, start it once, then try again")
@@ -42,12 +47,12 @@ func (g *Game) PlayOfficial(fabricProfile []byte, profileID, profileName string)
 	}
 	s := g.settings.Get()
 	profile := map[string]any{
-		"name":          officialName(profileID, profileName),
+		"name":          name,
 		"type":          "custom",
 		"lastUsed":      time.Now().UTC().Format("2006-01-02T15:04:05.000Z"),
 		"lastVersionId": fabricVersionID,
-		"gameDir":       g.paths.Instance,
-		"javaArgs":      strings.Join(jvmArgs(s), " "),
+		"gameDir":       gameDir,
+		"javaArgs":      strings.Join(append(jvmArgs(s), extraJavaArgs...), " "),
 		"icon":          "data:image/png;base64," + base64.StdEncoding.EncodeToString(iconPNG),
 	}
 	if !s.Fullscreen {
@@ -58,7 +63,7 @@ func (g *Game) PlayOfficial(fabricProfile []byte, profileID, profileName string)
 		files = append(files, filepath.Join(mc, "launcher_profiles_microsoft_store.json"))
 	}
 	for _, f := range files {
-		if err := upsertLauncherProfile(f, officialKey(profileID), profile); err != nil {
+		if err := upsertLauncherProfile(f, key, profile); err != nil {
 			return fmt.Errorf("cannot update %s: %w", filepath.Base(f), err)
 		}
 	}
@@ -140,6 +145,6 @@ func startOfficialLauncher() error {
 		if path, err := exec.LookPath("minecraft-launcher"); err == nil {
 			return exec.Command(path).Start()
 		}
-		return errors.New("the profile was added; start the Minecraft Launcher and pick \"Annoying Client\"")
+		return errors.New("the profile was added; start the Minecraft Launcher and pick it there")
 	}
 }

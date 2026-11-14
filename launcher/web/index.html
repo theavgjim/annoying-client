@@ -19,6 +19,7 @@
     </div>
     <nav>
       <button class="nav active" data-page="play"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>Play</button>
+      <button class="nav nav-boosted" data-page="boosted" title="Starts your mods from the Annoying Client profile, without Annoying Client"><svg viewBox="0 0 24 24"><path d="M13 2L4 14h7l-1 8 9-12h-7z"/></svg><span>Normal FPS Boosted Minecraft</span></button>
       <button class="nav" data-page="mods"><svg viewBox="0 0 24 24"><path d="M4 7l8-4 8 4v10l-8 4-8-4z M4 7l8 4 8-4 M12 11v10" fill="none" stroke-width="2"/></svg>Mods</button>
       <button class="nav" data-page="performance"><svg viewBox="0 0 24 24"><path d="M13 2L4 14h7l-1 8 9-12h-7z"/></svg>Performance</button>
       <button class="nav" data-page="console"><svg viewBox="0 0 24 24"><path d="M4 5h16v14H4z M7 9l3 3-3 3 M12 15h5" fill="none" stroke-width="2"/></svg>Console</button>
@@ -28,6 +29,31 @@
   </aside>
 
   <main>
+    <!-- NORMAL FPS BOOSTED MINECRAFT -->
+    <section class="page" id="page-boosted">
+      <div class="hero">
+        <div class="hero-glow"></div>
+        <div class="hero-content">
+          <div class="eyebrow">Minecraft <span class="mc-version-copy"></span> &middot; Fabric</div>
+          <h1>NORMAL <span class="grad">FPS BOOSTED</span></h1>
+          <p class="lead">Your mods from the <b>Annoying Client</b> profile, without the Annoying Client mod. Same worlds, options and FPS settings.</p>
+          <div class="play-row">
+            <button class="play" id="boosted-play"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg><span>PLAY</span></button>
+          </div>
+          <div class="mode-hint" id="boosted-hint"></div>
+          <div class="progress hidden" id="boosted-progress">
+            <div class="progress-top"><span class="progress-stage">Preparing</span><span class="progress-detail"></span></div>
+            <div class="bar"><div class="fill"></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <h3>Starts with these mods <span class="muted" id="boosted-count"></span></h3>
+        <div class="boosted-mods" id="boosted-mods"></div>
+        <p class="hint">Add or remove them on the Mods page while the <b>Annoying Client</b> profile is selected. Your mods folder is not changed: the mods are linked into a separate folder for this mode.</p>
+      </div>
+    </section>
+
     <!-- PLAY -->
     <section class="page active" id="page-play">
       <div class="update-banner hidden" id="update-banner">
