@@ -14,9 +14,7 @@ import com.annoyingclient.hud.element.CoordinatesHud;
 import com.annoyingclient.hud.element.CpsHud;
 import com.annoyingclient.hud.element.FpsHud;
 import com.annoyingclient.hud.element.KeystrokesHud;
-import com.annoyingclient.hud.element.ModuleListHud;
 import com.annoyingclient.hud.element.PingHud;
-import com.annoyingclient.hud.element.WatermarkHud;
 import com.annoyingclient.manager.KeybindManager;
 import com.annoyingclient.manager.ModuleManager;
 import com.annoyingclient.module.impl.misc.BackgroundFpsModule;
@@ -36,12 +34,9 @@ import com.annoyingclient.module.impl.visual.ZoomModule;
 import com.annoyingclient.module.Module;
 import com.annoyingclient.notification.NotificationManager;
 import com.annoyingclient.notification.NotificationType;
-import com.annoyingclient.render.RenderUtil;
-import com.annoyingclient.render.TextRenderer;
 import com.annoyingclient.render.Textures;
 import com.annoyingclient.setting.Setting;
 import com.annoyingclient.theme.ThemeManager;
-import com.annoyingclient.util.ColorUtil;
 import com.annoyingclient.util.CpsTracker;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
@@ -165,8 +160,6 @@ public final class AnnoyingClient implements ClientModInitializer {
         modules.register(new NoHurtCamModule());
         modules.register(new LowFireModule());
         // HUD
-        modules.register(new WatermarkHud());
-        modules.register(new ModuleListHud());
         modules.register(new FpsHud());
         modules.register(new PingHud());
         modules.register(new CpsHud());
@@ -205,7 +198,7 @@ public final class AnnoyingClient implements ClientModInitializer {
         Textures.init();
         ClickGuiModule gui = modules.get(ClickGuiModule.class);
         String key = gui != null && gui.getKeybind().isBound() ? gui.getKeybind().getDisplayName() : "the ClickGUI keybind";
-        notifications.push(NotificationType.INFO, BRANDING + " loaded", "Press " + key + " to open the menu");
+        notifications.push(NotificationType.INFO, NAME + " loaded", "Press " + key + " to open the menu");
         LOGGER.info("{} is ready", BRANDING);
     }
 
@@ -219,13 +212,6 @@ public final class AnnoyingClient implements ClientModInitializer {
                                 b -> client.setScreen(new ClickGuiScreen(screen)))
                         .bounds(4, 4, 98, 20)
                         .build());
-                ScreenEvents.afterRender(screen).register((s, g, mouseX, mouseY, delta) -> {
-                    int plus = version.indexOf('+');
-                    String text = BRANDING + "  v" + (plus > 0 ? version.substring(0, plus) : version);
-                    int color = ColorUtil.wave(theme.accent(), theme.accent2(), 0, 1f);
-                    TextRenderer.draw(g, text, s.width - 4 - TextRenderer.width(text), 4, color);
-                    RenderUtil.rect(g, s.width - 4 - TextRenderer.width(text), 14, TextRenderer.width(text), 1, color);
-                });
             }
         });
     }

@@ -77,8 +77,8 @@ Mouse buttons 3-5 (middle and side buttons) can be bound too.
 - The window scales with the *GUI Scale* setting and is clamped to fit any resolution.
 
 ### HUD
-Watermark, FPS, Coordinates (with nether/overworld conversion and facing), Clock, Keystrokes (with CPS),
-Armor HUD, CPS, Ping and an animated Module List.
+FPS, Coordinates (with nether/overworld conversion and facing), Clock, Keystrokes (with CPS),
+Armor HUD, Potion Effects, CPS and Ping. No watermark or module list: the HUD looks like a normal client.
 
 Each element has position, scale, visibility, a background toggle and a custom color. Positions are
 stored relative to the nearest screen edge or center, so the layout survives resolution and GUI scale changes.
@@ -91,7 +91,7 @@ from the Elements panel.
 | Category | Modules |
 |---|---|
 | Render | No Hurt Cam, Low Fire |
-| HUD | Watermark, Module List, FPS Display, Ping Display, CPS Display, Coordinates, Clock, Keystrokes, Armor HUD |
+| HUD | FPS Display, Ping Display, CPS Display, Coordinates, Clock, Keystrokes, Armor HUD, Potion Effects |
 | Utility | ClickGUI, HUD Editor, Notifications, Profile Switcher, Theme Switcher |
 | Visual | Fullbright, Custom Crosshair, Zoom, HUD Colors, Screenshot Manager, Cosmetics |
 | Miscellaneous | Background FPS |
@@ -227,7 +227,7 @@ public class MyModule extends Module {
     @Override protected void onDisable() { /* ... */ }
 }
 ```
-Register it in `AnnoyingClient#registerModules()`. The ClickGUI, keybinds, Module List and
+Register it in `AnnoyingClient#registerModules()`. The ClickGUI, keybinds, HUD and
 configuration pick it up automatically. For a HUD element, extend `HudModule` and draw at (0, 0) in `renderContent`.
 
 ## Versions

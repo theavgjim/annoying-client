@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.3.2 (Minecraft 1.21.11)
+
+- **Removed the Watermark and Module List** HUD elements and the title-screen watermark, so the HUD looks like a
+  normal client. The FPS, Coordinates, Ping and CPS displays move up into the free space.
+- **Normal FPS Boosted Minecraft always opens through the Minecraft Launcher** (no Microsoft sign-in needed in
+  this launcher): pick the "Normal FPS Boosted (no Annoying Client)" profile there and press Play.
+
 ## 1.3.1 (Minecraft 1.21.11)
 
 - **Normal FPS Boosted Minecraft** (launcher sidebar): starts Minecraft with your mods from the

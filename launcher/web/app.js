@@ -127,9 +127,7 @@ function render() {
   bplay.classList.toggle("running", state.running);
   bplay.disabled = state.busy || state.running;
   $("span", bplay).textContent = state.running ? "RUNNING" : state.busy ? "WORKING..." : "PLAY";
-  $("#boosted-hint").textContent = mode === "official"
-    ? "Opens the Minecraft Launcher with the \"Normal FPS Boosted (no Annoying Client)\" profile."
-    : "Starts directly with your signed-in account.";
+  $("#boosted-hint").textContent = "Opens the Minecraft Launcher with the \"Normal FPS Boosted (no Annoying Client)\" profile. Press Play there.";
   $$(".mc-version-copy").forEach((e) => (e.textContent = $("#mc-version").textContent));
 
   const play = $("#play-btn");
@@ -204,17 +202,9 @@ async function loadBoosted() {
 
 async function playBoosted() {
   if (state?.running) { toast("info", "Minecraft is already running", "Close it first to start Normal FPS Boosted."); return; }
-  if (mode === "direct" && !state.account && !state.testAccount) {
-    if (!state.settings.clientId) {
-      show("settings");
-      toast("info", "Direct launch needs setup", "Add an approved Microsoft application ID, or play via the Minecraft Launcher.");
-    } else {
-      startLogin();
-    }
-    return;
-  }
+  // Always through the official Minecraft Launcher (no sign-in needed here).
   setProgress({ stage: "Starting", fraction: 0 });
-  await guarded($("#boosted-play"), () => api("/api/play", { mode, plain: true }));
+  await guarded($("#boosted-play"), () => api("/api/play", { mode: "official", plain: true }));
 }
 $("#boosted-play").addEventListener("click", playBoosted);
 

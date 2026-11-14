@@ -24,7 +24,7 @@ public class CoordinatesHud extends HudModule {
     private int lastFlags = -1;
 
     public CoordinatesHud() {
-        super("Coordinates", "Shows your position, facing and nether coordinates", true, ANCHOR_START, ANCHOR_START, 4, 39);
+        super("Coordinates", "Shows your position, facing and nether coordinates", true, ANCHOR_START, ANCHOR_START, 4, 21);
     }
 
     @Override

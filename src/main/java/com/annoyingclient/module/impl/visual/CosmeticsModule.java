@@ -23,10 +23,6 @@ public class CosmeticsModule extends Module {
         super("Cosmetics", "Capes and particle trails (Wardrobe tab in the ClickGUI)", Category.VISUAL, true, KeybindSetting.NONE);
     }
 
-    @Override
-    protected boolean listedByDefault() {
-        return false;
-    }
 
     /** The server to use: the setting, else ANNOYING_COSMETICS_URL (tests), else the official server; "off" disables it. */
     public String serverUrl() {

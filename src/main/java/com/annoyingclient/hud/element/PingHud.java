@@ -6,7 +6,7 @@ import net.minecraft.client.multiplayer.PlayerInfo;
 public class PingHud extends SimpleTextHud {
 
     public PingHud() {
-        super("Ping Display", "Shows your latency to the server", false, ANCHOR_START, ANCHOR_START, 4, 84);
+        super("Ping Display", "Shows your latency to the server", false, ANCHOR_START, ANCHOR_START, 4, 66);
     }
 
     private int latency() {

@@ -4,7 +4,7 @@ import com.annoyingclient.AnnoyingClient;
 import com.annoyingclient.gui.clickgui.ClickGuiScreen;
 import com.annoyingclient.hud.HudEditorScreen;
 import com.annoyingclient.hud.HudModule;
-import com.annoyingclient.hud.element.WatermarkHud;
+import com.annoyingclient.hud.element.FpsHud;
 import com.annoyingclient.module.impl.visual.CrosshairModule;
 import com.annoyingclient.module.impl.visual.FullbrightModule;
 import com.annoyingclient.module.impl.visual.ScreenshotModule;
@@ -553,7 +553,7 @@ public class AnnoyingClientGameTest implements FabricClientGameTest {
         ctx.takeScreenshot("annoying-17-hud-editor");
         double scale = ctx.computeOnClient(mc -> (double) mc.getWindow().getGuiScale());
         float[] wm = ctx.computeOnClient(mc -> {
-            WatermarkHud w = AnnoyingClient.modules().get(WatermarkHud.class);
+            FpsHud w = AnnoyingClient.modules().get(FpsHud.class);
             int sw = mc.getWindow().getGuiScaledWidth();
             int sh = mc.getWindow().getGuiScaledHeight();
             return new float[]{w.getScreenX(sw) + 8, w.getScreenY(sh) + 6, sw, sh};
@@ -568,8 +568,8 @@ public class AnnoyingClientGameTest implements FabricClientGameTest {
         }
         ctx.getInput().releaseMouse(GLFW.GLFW_MOUSE_BUTTON_LEFT);
         ctx.waitTicks(3);
-        float newX = ctx.computeOnClient(mc -> AnnoyingClient.modules().get(WatermarkHud.class).getScreenX(mc.getWindow().getGuiScaledWidth()));
-        check(newX > wm[2] * 0.3f, "Dragging the watermark should move it toward the center, x is " + newX);
+        float newX = ctx.computeOnClient(mc -> AnnoyingClient.modules().get(FpsHud.class).getScreenX(mc.getWindow().getGuiScaledWidth()));
+        check(newX > wm[2] * 0.3f, "Dragging the FPS display should move it toward the center, x is " + newX);
         ctx.takeScreenshot("annoying-18-hud-editor-dragged");
         ctx.getInput().pressKey(GLFW.GLFW_KEY_ESCAPE);
         ctx.waitFor(mc -> mc.screen == null);
@@ -585,8 +585,10 @@ public class AnnoyingClientGameTest implements FabricClientGameTest {
             JsonObject pvp = JsonParser.parseString(Files.readString(dir.resolve("profiles/pvp.json"), StandardCharsets.UTF_8)).getAsJsonObject();
             String savedTheme = pvp.getAsJsonObject("theme").get("Theme").getAsString();
             check(savedTheme.equals("Crimson"), "pvp.json should store the Crimson theme, has " + savedTheme);
-            JsonObject watermark = pvp.getAsJsonObject("modules").getAsJsonObject("Watermark").getAsJsonObject("settings");
-            check(watermark.get("Anchor X").getAsInt() == 1, "Watermark should be saved with a center anchor");
+            JsonObject fps = pvp.getAsJsonObject("modules").getAsJsonObject("FPS Display").getAsJsonObject("settings");
+            check(fps.get("Anchor X").getAsInt() == 1, "The dragged FPS display should be saved with a center anchor");
+            check(!pvp.getAsJsonObject("modules").has("Watermark") && !pvp.getAsJsonObject("modules").has("Module List"),
+                    "Watermark and Module List are removed");
             check(pvp.getAsJsonObject("modules").getAsJsonObject("Custom Crosshair").get("enabled").getAsBoolean(),
                     "Custom Crosshair enabled state should be saved");
 

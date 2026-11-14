@@ -8,7 +8,6 @@ import (
 	"path/filepath"
 	"sort"
 	"strings"
-	"time"
 )
 
 // "Normal FPS Boosted Minecraft": the default ("Annoying Client") profile's game folder, settings and mods,
@@ -124,8 +123,9 @@ func (a *App) plainInfo() (any, error) {
 	return map[string]any{"profile": "Annoying Client", "mods": out}, nil
 }
 
-// playPlain starts "Normal FPS Boosted Minecraft" in the given launch mode ("direct" or "official").
-func (a *App) playPlain(mode string) {
+// playPlain starts "Normal FPS Boosted Minecraft" through the official Minecraft Launcher: it adds (or
+// updates) a "Normal FPS Boosted (no Annoying Client)" profile there and opens the launcher.
+func (a *App) playPlain() {
 	ctx := context.Background()
 	fail := func(err error) {
 		logf("plain launch failed: %v", err)
@@ -138,63 +138,30 @@ func (a *App) playPlain(mode string) {
 		fail(err)
 		return
 	}
-	dst := filepath.Join(paths.Instance, plainModsFolder)
-	prepareMods := func() error {
-		names, err := syncPlainMods(paths.Mods, dst)
+	if err := a.game.begin(); err != nil {
+		fail(err)
+		return
+	}
+	err = func() error {
+		defer a.game.end()
+		if err := a.prepareOfficialFor(ctx, paths, mods); err != nil {
+			return err
+		}
+		names, err := syncPlainMods(paths.Mods, filepath.Join(paths.Instance, plainModsFolder))
 		if err != nil {
 			return err
 		}
 		logf("plain mode: %d mods without Annoying Client", len(names))
-		return nil
-	}
-	if mode == "official" {
-		if err := a.game.begin(); err != nil {
-			fail(err)
-			return
-		}
-		err := func() error {
-			defer a.game.end()
-			if err := a.prepareOfficialFor(ctx, paths, mods); err != nil {
-				return err
-			}
-			if err := prepareMods(); err != nil {
-				return err
-			}
-			_, profile, err := fetchFabricProfile(ctx, paths)
-			if err != nil {
-				return err
-			}
-			return a.game.playOfficialProfile(profile, plainOfficialKey, plainOfficialName, paths.Instance, []string{"-Dfabric.modsFolder=" + plainModsFolder})
-		}()
+		_, profile, err := fetchFabricProfile(ctx, paths)
 		if err != nil {
-			fail(err)
-			return
+			return err
 		}
-		a.events.Send("progress", nil)
-		a.events.notify("success", "Opening the Minecraft Launcher", "Pick the \""+plainOfficialName+"\" profile and press Play")
-		return
-	}
-	acc, err := a.launchAccount(ctx)
-	if err != nil {
-		fail(err)
-		return
-	}
-	spec := launchSpec{
-		paths:       paths,
-		mods:        mods,
-		extraJVM:    []string{"-Dfabric.modsFolder=" + dst},
-		versionType: "Fabric",
-		beforeStart: prepareMods,
-	}
-	err = a.game.LaunchSpec(ctx, acc, spec, func(code int, d time.Duration) {
-		if code != 0 && d < 2*time.Minute {
-			a.events.notify("error", "Minecraft closed unexpectedly", fmt.Sprintf("Exit code %d. Open the Console tab for details.", code))
-		}
-	})
+		return a.game.playOfficialProfile(profile, plainOfficialKey, plainOfficialName, paths.Instance, []string{"-Dfabric.modsFolder=" + plainModsFolder})
+	}()
 	if err != nil {
 		fail(err)
 		return
 	}
 	a.events.Send("progress", nil)
-	a.events.notify("success", "Minecraft is starting", "Normal FPS Boosted: your mods, without Annoying Client")
+	a.events.notify("success", "Opening the Minecraft Launcher", "Pick the \""+plainOfficialName+"\" profile and press Play")
 }

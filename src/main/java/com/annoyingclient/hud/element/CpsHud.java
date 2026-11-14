@@ -8,7 +8,7 @@ public class CpsHud extends SimpleTextHud {
     private final BooleanSetting showRight = add(new BooleanSetting("Show Right Click", "Also show right-click CPS", true));
 
     public CpsHud() {
-        super("CPS Display", "Shows clicks per second", false, ANCHOR_START, ANCHOR_START, 4, 101);
+        super("CPS Display", "Shows clicks per second", false, ANCHOR_START, ANCHOR_START, 4, 83);
     }
 
     @Override

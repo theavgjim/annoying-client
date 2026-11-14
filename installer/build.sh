@@ -3,7 +3,7 @@
 # Requirements: Go 1.24+, Python 3 with Pillow, and a finished `./gradlew build` in the parent directory.
 set -euo pipefail
 cd "$(dirname "$0")"
-VERSION=1.3.1
+VERSION=1.3.2
 JAR=../build/libs/annoying-client-${VERSION}+mc1.21.11.jar
 FABRIC_API=fabric-api-0.141.6+1.21.11.jar
 mkdir -p payload ../release

@@ -1,4 +1,4 @@
 /**
- * Concrete HUD elements (watermark, FPS, coordinates, clock, keystrokes, armor, CPS, ping, module list, crosshair).
+ * Concrete HUD elements (FPS, coordinates, clock, keystrokes, armor, potion effects, CPS, ping).
  */
 package com.annoyingclient.hud.element;

@@ -37,8 +37,4 @@ public class NotificationsModule extends Module {
         apply();
     }
 
-    @Override
-    protected boolean listedByDefault() {
-        return false;
-    }
 }

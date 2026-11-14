@@ -25,7 +25,7 @@ import (
 )
 
 // launcherVersion is set at build time for test builds (-ldflags "-X main.launcherVersion=...").
-var launcherVersion = "1.3.1"
+var launcherVersion = "1.3.2"
 
 var logger = log.New(os.Stderr, "", log.LstdFlags)
 

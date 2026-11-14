@@ -69,8 +69,4 @@ public class ScreenshotModule extends Module {
         return sessionCount == 0 ? "" : Integer.toString(sessionCount);
     }
 
-    @Override
-    protected boolean listedByDefault() {
-        return false;
-    }
 }

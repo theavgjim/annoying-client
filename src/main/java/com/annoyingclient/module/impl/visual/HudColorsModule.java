@@ -51,8 +51,4 @@ public class HudColorsModule extends Module {
         return mode.getValue();
     }
 
-    @Override
-    protected boolean listedByDefault() {
-        return false;
-    }
 }

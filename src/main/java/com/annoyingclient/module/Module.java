@@ -4,7 +4,6 @@ import com.annoyingclient.AnnoyingClient;
 import com.annoyingclient.setting.BooleanSetting;
 import com.annoyingclient.setting.KeybindSetting;
 import com.annoyingclient.setting.Setting;
-import com.annoyingclient.util.Animation;
 import net.minecraft.client.Minecraft;
 
 import java.util.ArrayList;
@@ -16,7 +15,7 @@ import java.util.List;
  *
  * <p>To add a module: extend this class, declare settings with {@link #add(Setting)} in the
  * constructor, override {@link #onEnable()} / {@link #onDisable()} if needed, and register an
- * instance in {@code ModuleManager#registerDefaults}. The ClickGUI, keybinds, module list and
+ * instance in {@code ModuleManager#registerDefaults}. The ClickGUI, keybinds, HUD and
  * configuration pick it up automatically.
  */
 public abstract class Module {
@@ -43,10 +42,6 @@ public abstract class Module {
     private final List<Setting<?>> settingsView = Collections.unmodifiableList(settings);
 
     protected final KeybindSetting keybind;
-    protected final BooleanSetting showInModuleList;
-
-    /** Slides the module in and out of the HUD module list. */
-    private final Animation listAnimation = new Animation(0f, 14f);
 
     protected Module(String name, String description, Category category) {
         this(name, description, category, false, KeybindSetting.NONE);
@@ -58,8 +53,6 @@ public abstract class Module {
         this.category = category;
         this.enabledByDefault = enabledByDefault;
         this.keybind = add(new KeybindSetting("Keybind", "Key that toggles " + name, defaultKey));
-        this.showInModuleList = add(new BooleanSetting("Show in Module List", "List this module on the HUD while it is enabled",
-                listedByDefault()));
     }
 
     public static void setToggleListener(ToggleListener listener) {
@@ -131,21 +124,9 @@ public abstract class Module {
     protected void onActivate() {
     }
 
-    /**
-     * Default for "Show in Module List". Called from the constructor, so overrides must return a constant.
-     * HUD elements and always-on helper modules are not listed by default.
-     */
-    protected boolean listedByDefault() {
-        return category != Category.HUD;
-    }
-
-    /** Short text shown after the module name in the module list, e.g. "4.0x" for Zoom. Empty for none. */
+    /** Short status text, e.g. "4.0x" for Zoom. Empty for none. */
     public String getDisplayInfo() {
         return "";
-    }
-
-    public boolean isVisibleInModuleList() {
-        return isToggleable() && showInModuleList.isEnabled();
     }
 
     public boolean isEnabled() {
@@ -185,9 +166,6 @@ public abstract class Module {
         return null;
     }
 
-    public Animation getListAnimation() {
-        return listAnimation;
-    }
 
     /** Resets every setting and the enabled state to defaults. */
     public void resetToDefaults() {
