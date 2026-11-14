@@ -10,8 +10,8 @@ import (
 	"strings"
 )
 
-// "Normal FPS Boosted Minecraft": the default ("Annoying Client") profile's game folder, settings and mods,
-// started WITHOUT the Annoying Client mod. The mods folder itself is never changed: the enabled mods are
+// "Normal FPS Boosted Minecraft": the selected profile's game folder, settings and mods, started WITHOUT
+// the Annoying Client mod. The mods folder itself is never changed: the enabled mods are
 // linked (or copied) into a separate folder, and Fabric is pointed at it with -Dfabric.modsFolder.
 
 // plainModsFolder lives inside the game folder and is passed as a relative path: the game always runs
@@ -89,23 +89,18 @@ func copyFile(from, to string) error {
 	return os.Rename(to+".tmp", to)
 }
 
-// plainTarget returns the default profile's paths and mod manager (the active ones if it is selected).
-func (a *App) plainTarget() (Paths, *ModManager, error) {
+// plainTarget returns the selected profile's paths and mod manager: the profile the player uses Annoying
+// Client with. Sharing its game folder keeps every setting (options, keybinds, video and mod settings,
+// resource packs, servers, worlds) the same in both modes, in both directions.
+func (a *App) plainTarget() (Paths, *ModManager, Profile, error) {
 	a.profileMu.Lock()
 	defer a.profileMu.Unlock()
-	if a.profiles.ActiveProfile().ID == "default" {
-		return a.paths, a.mods, nil
-	}
-	p := a.paths.withInstance(a.profiles.Dir("default"))
-	if err := p.ensure(); err != nil {
-		return Paths{}, nil, err
-	}
-	return p, newModManager(p.Mods), nil
+	return a.paths, a.mods, a.profiles.ActiveProfile(), nil
 }
 
 // plainInfo lists the mods the plain mode will start with (for the launcher page).
 func (a *App) plainInfo() (any, error) {
-	_, mods, err := a.plainTarget()
+	_, mods, profile, err := a.plainTarget()
 	if err != nil {
 		return nil, err
 	}
@@ -120,7 +115,7 @@ func (a *App) plainInfo() (any, error) {
 		}
 		out = append(out, map[string]any{"name": m.Name, "version": m.Version, "file": m.File, "icon": m.IconURL})
 	}
-	return map[string]any{"profile": "Annoying Client", "mods": out}, nil
+	return map[string]any{"profile": profile.Name, "mods": out}, nil
 }
 
 // playPlain starts "Normal FPS Boosted Minecraft" through the official Minecraft Launcher: it adds (or
@@ -133,7 +128,7 @@ func (a *App) playPlain() {
 		a.events.Send("progress", nil)
 		a.events.Send("state", nil)
 	}
-	paths, mods, err := a.plainTarget()
+	paths, mods, _, err := a.plainTarget()
 	if err != nil {
 		fail(err)
 		return

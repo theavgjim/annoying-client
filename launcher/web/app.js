@@ -180,11 +180,12 @@ async function loadBoosted() {
   try {
     const info = await api("/api/plain");
     const mods = info.mods || [];
+    $("#boosted-profile").textContent = info.profile || "Annoying Client";
     $("#boosted-count").textContent = "(" + mods.length + ")";
     const box = $("#boosted-mods");
     box.innerHTML = "";
     if (!mods.length) {
-      box.innerHTML = '<span class="empty">Only Minecraft and Fabric: the Annoying Client profile has no other mods yet.</span>';
+      box.innerHTML = '<span class="empty">Only Minecraft and Fabric: this profile has no other mods yet.</span>';
     }
     for (const m of mods) {
       const chip = document.createElement("span");

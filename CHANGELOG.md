@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.3.3 (Minecraft 1.21.11)
+
+- **Normal FPS Boosted keeps your settings.** It now uses the profile you play Annoying Client with (the one
+  selected on the Play page) instead of always the default one: same mods, options, keybinds, video and mod
+  settings, resource packs, servers and worlds. Changes made in either mode are kept for both.
+
 ## 1.3.2 (Minecraft 1.21.11)
 
 - **Removed the Watermark and Module List** HUD elements and the title-screen watermark, so the HUD looks like a
